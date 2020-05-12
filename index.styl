@@ -11,14 +11,17 @@ body
   font-size 16px
 
 .putty
-  user-select none
+  height 20px
 
 .box
-  position relative
+  position absolute
   border 1px solid white
   border-radius 3px
-  cursor pointer
-  z-index 1
+  top 0px
+  height 20px
+  pointer-events none
+  &.selected
+    border-color red
 
 .area
   position relative

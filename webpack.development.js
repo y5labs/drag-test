@@ -10,6 +10,7 @@ module.exports = merge(base, {
     new HotModuleReplacementPlugin()
   ],
   devServer: {
-    contentBase: './dist',
+    host: '0.0.0.0',
+    contentBase: './dist'
   }
 })

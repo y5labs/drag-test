@@ -17,10 +17,20 @@ export default component({
       const current = [e.clientX - rect.left, e.clientY - rect.top]
       delta = [current[0] - start[0], current[1] - start[1]]
       if (!hasmoved) {
-        hub.emit('start', { start: start })
+        hub.emit('start', { start })
         hasmoved = true
       }
-      hub.emit('move', { start: start, current: current, delta: delta })
+      hub.emit('move', { start, current, delta })
+    }
+    const hover = e => {
+      if (hasmoved) return
+      const rect = e.target.getBoundingClientRect()
+      const current = [e.clientX - rect.left, e.clientY - rect.top]
+      hub.emit('hover', { current })
+    }
+    const mouseleave = e => {
+      if (hasmoved) return
+      hub.emit('leave')
     }
     const mouseup = e => {
       const rect = e.target.getBoundingClientRect()
@@ -29,7 +39,8 @@ export default component({
       window.removeEventListener('mousemove', mousemove)
       window.removeEventListener('mouseup', mouseup)
       if (!hasmoved) hub.emit('tap', start)
-      else hub.emit('end', { start: start, end: end, delta: delta })
+      else hub.emit('end', { start, end, delta })
+      hasmoved = false
     }
     const mousedown = e => {
       e.preventDefault()
@@ -39,28 +50,24 @@ export default component({
       window.addEventListener('mousemove', mousemove)
       window.addEventListener('mouseup', mouseup)
     }
-    const cancelmousedown = e => {
-      e.stopPropagation()
-      e.preventDefault()
-    }
     const touchmove = e => {
-      rect = e.target.getBoundingClientRect()
-      current = [e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top]
-      delta = [current[0] - start[0], current[1] - start[1]]
+      const rect = e.target.getBoundingClientRect()
+      const current = [e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top]
+      const delta = [current[0] - start[0], current[1] - start[1]]
       if (!hasmoved) {
-        hub.emit('start', { start: start })
+        hub.emit('start', { start })
         hasmoved = true
       }
-      hub.emit('move', { start: start, current: current, delta: delta })
+      hub.emit('move', { start, current, delta })
     }
     const touchend = e => {
-      rect = e.target.getBoundingClientRect()
-      end = [e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top]
-      delta = [end[0] - start[0], end[1] - start[1]]
+      const rect = e.target.getBoundingClientRect()
+      const end = [e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top]
+      const delta = [end[0] - start[0], end[1] - start[1]]
       window.removeEventListener('touchmove', touchmove)
       window.removeEventListener('touchend', touchend)
       if (!hasmoved) hub.emit('tap', start)
-      else hub.emit('end', { start: start, end: end, delta: delta })
+      else hub.emit('end', { start, end, delta })
     }
     const touchstart = e => {
       e.preventDefault()
@@ -74,7 +81,7 @@ export default component({
     }
     const content = scopedSlots.default ? [scopedSlots.default()] : []
     return istouch
-      ? h('div.putty', { on: { touchstart: touchstart }}, content)
-      : h('div.putty', { on: { mousedown: mousedown }}, content)
+      ? h('.putty', { on: { touchstart }}, content)
+      : h('.putty', { on: { mousedown, mousemove: hover, mouseleave }}, content)
   }
 })
