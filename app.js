@@ -1,70 +1,41 @@
 import component from './component'
 import putty from './putty'
-import { toDate, format, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
-import { fromUnixTime, getUnixTime, formatDistanceStrict, parseISO } from 'date-fns'
-import enGB from 'date-fns/locale/en-GB'
-const fmt = (d, tz) =>
-  format(d, 'yyyy-MM-dd\'T\'HH:mm:ss (zzzz)', { timeZone: tz, locale: enGB })
+import { format, utcToZonedTime } from 'date-fns-tz'
+import locale from 'date-fns/locale/en-GB'
+const fmt = (d, timeZone) =>
+  format(
+    utcToZonedTime(d, timeZone),
+    'yyyy-MM-dd\'T\'HH:mm:ss (zzzz)',
+    { timeZone, locale })
 
 import spanner from './lib/spanner'
 import chrono from './lib/chrono'
+import schedule from './lib/schedule'
+import dsl from './lib/dsl'
 
-// const nzdaylightsavingsexample = [
-//   '2020-04-04T12:00:00Z',
-//   '2020-04-04T12:30:00Z',
-//   '2020-04-04T13:00:00Z',
-//   '2020-04-04T13:30:00Z',
-//   '2020-04-04T14:00:00Z',
-//   '2020-04-04T14:30:00Z',
-//   '2020-04-04T15:00:00Z',
-//   '2020-04-04T15:30:00Z',
-//   '2020-04-04T16:00:00Z',
-//   '2020-04-04T16:30:00Z',
-//   '2020-04-04T17:00:00Z'
-// ]
+const parsed = dsl(`
 
-// for (const d of nzdaylightsavingsexample)
-//   console.log(fmt(utcToZonedTime(parseISO(d), 'Pacific/Auckland'), 'Pacific/Auckland'))
+  start: now/M
+  end: now+4M/M
 
-// const usdaylightsavingsexample = [
-//   '2020-03-08T06:00:00Z',
-//   '2020-03-08T06:30:00Z',
-//   '2020-03-08T07:00:00Z',
-//   '2020-03-08T07:30:00Z',
-//   '2020-03-08T08:00:00Z',
-//   '2020-03-08T08:30:00Z',
-//   '2020-03-08T09:00:00Z',
-//   '2020-03-08T09:30:00Z',
-//   '2020-03-08T10:00:00Z',
-//   '2020-03-08T10:30:00Z',
-//   '2020-03-08T11:00:00Z'
-// ]
+  // the first tuesday of every month
+  result:
+    + interval(now/M, +7d, 1M)
 
-// for (const d of usdaylightsavingsexample)
-//   console.log(fmt(utcToZonedTime(parseISO(d), 'America/New_York'), 'America/New_York'))
-
-// console.log(fmt(spanner(new Date(), '(Pacific/Auckland)-5d/isow'), 'Pacific/Auckland'))
-
-const days = chrono(parseISO('2020-05-12T00:00:00Z'), 1, 'd', 'Pacific/Auckland')
-console.log(fmt(days.nth(-1), 'Pacific/Auckland'))
-console.log(fmt(days.nth(0), 'Pacific/Auckland'))
-console.log(fmt(days.nth(1), 'Pacific/Auckland'))
-console.log(fmt(days.nth(2), 'Pacific/Auckland'))
-console.log(days.floor(parseISO('2020-05-10T10:00:00Z')))
-console.log(days.floor(parseISO('2020-05-11T10:00:00Z')))
-console.log(days.floor(parseISO('2020-05-12T10:00:00Z')))
-console.log(days.floor(parseISO('2020-05-13T10:00:00Z')))
-console.log(days.floor(parseISO('2020-05-14T10:00:00Z')))
-console.log()
-console.log(days.ceil(parseISO('2020-05-10T10:00:00Z')))
-console.log(days.ceil(parseISO('2020-05-11T10:00:00Z')))
-console.log(days.ceil(parseISO('2020-05-12T10:00:00Z')))
-console.log(days.ceil(parseISO('2020-05-13T10:00:00Z')))
-console.log(days.ceil(parseISO('2020-05-14T10:00:00Z')))
-console.log(days.between(
-  parseISO('2020-05-02T00:00:00Z'),
-  parseISO('2020-05-03T00:00:00Z')
-).map(d => fmt(d, 'Pacific/Auckland')))
+`,
+'America/New_York')
+console.log(parsed.constants)
+const segments = schedule(
+  parsed.schedules,
+  parsed.schedules.result,
+  {
+    start: parsed.constants.start,
+    end: parsed.constants.end
+  },
+  'America/New_York')
+for (let segment of segments) {
+  console.log(`${fmt(segment.start, 'America/New_York')} — ${fmt(segment.end, 'America/New_York')}`)
+}
 
 
 // const dataset = [
