@@ -1,17 +1,16 @@
 import component from './component'
 import putty from './putty'
 import { format, utcToZonedTime } from 'date-fns-tz'
+import { getUnixTime, parseISO } from 'date-fns'
 import locale from 'date-fns/locale/en-GB'
 const fmt = (d, timeZone) =>
   format(
     utcToZonedTime(d, timeZone),
-    'yyyy-MM-dd\'T\'HH:mm:ss (zzzz)',
+    'yyyy-MM-dd\'T\'HH:mm:ss (zzz)',
     { timeZone, locale })
 
-import spanner from './lib/spanner'
-import chrono from './lib/chrono'
-import schedule from './lib/schedule'
 import dsl from './lib/dsl'
+import schedule from './lib/schedule'
 
 const parsed = dsl(`
 
@@ -20,7 +19,7 @@ const parsed = dsl(`
 
   // the first tuesday of every month
   result:
-    + interval(now/M, +7d, 1M)
+  + interval(now/M, +7d, 1M)
 
 `,
 'America/New_York')
@@ -38,42 +37,43 @@ for (let segment of segments) {
 }
 
 
-// const dataset = [
-//   [
-//     getUnixTime(parseISO('2020-05-10T23:00:00Z')),
-//     getUnixTime(parseISO('2020-05-11T00:00:00Z'))
-//   ],
-//   [
-//     getUnixTime(parseISO('2020-05-11T01:00:00Z')),
-//     getUnixTime(parseISO('2020-05-11T04:00:00Z'))
-//   ],
-//   [
-//     getUnixTime(parseISO('2020-05-11T04:00:00Z')),
-//     getUnixTime(parseISO('2020-05-11T05:00:00Z'))
-//   ]
-// ]
-// const visible = [
-//   getUnixTime(parseISO('2020-05-10T12:00:00Z')),
-//   getUnixTime(parseISO('2020-05-11T12:00:00Z'))
-// ]
-// const secondsInAPixel = 3 * 60
 
-// const x = d => (d - visible[0]) / secondsInAPixel
+const dataset = [
+  {
+    start: getUnixTime(parseISO('2020-05-10T23:00:00Z')),
+    end: getUnixTime(parseISO('2020-05-11T00:00:00Z'))
+  },
+  {
+    start: getUnixTime(parseISO('2020-05-11T01:00:00Z')),
+    end: getUnixTime(parseISO('2020-05-11T04:00:00Z'))
+  },
+  {
+    start: getUnixTime(parseISO('2020-05-11T04:00:00Z')),
+    end: getUnixTime(parseISO('2020-05-11T05:00:00Z'))
+  }
+]
+const visible = {
+  start: getUnixTime(parseISO('2020-05-10T12:00:00Z')),
+  end: getUnixTime(parseISO('2020-05-11T12:00:00Z'))
+}
+const secondsInAPixel = 3 * 60
 
-// const edges = Array.from(
-//   dataset.reduce((res, d, i) => {
-//     if (res.has(d[0])) res.get(d[0])[0] = i
-//     else res.set(d[0], [i, null])
-//     res.set(d[1], [null, i])
-//     return res
-//   }, new Map())
-//   .entries(),
-//   d => [ x(d[0]), ...d[1] ])
+const x = d => (d - visible.start) / secondsInAPixel
 
-// console.log(dataset, edges)
-// console.log(
-//   dataset.map(d => [ x(d[0]), x(d[1]) ])
-// )
+const edges = Array.from(
+  dataset.reduce((res, d, i) => {
+    if (res.has(d.start)) res.get(d.start).start = i
+    else res.set(d.start, { start: i, end: null })
+    res.set(d.end, { start: null, end: i })
+    return res
+  }, new Map())
+  .entries(),
+  d => ({ x: x(d[0]), ...d[1] }))
+
+console.log(dataset, edges)
+console.log(
+  dataset.map(d => ({ start: x(d.start), end: x(d.end) }))
+)
 
 
 
