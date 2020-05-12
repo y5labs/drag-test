@@ -65,43 +65,25 @@ export default component({
                   const edge = findEdge(x)
                   if (edge != null) {
                     if (edge.endindex != null) {
-                      operation = {
-                        type: 'resize end',
-                        index: edge.endindex,
-                        delta: 0
-                      }
+                      operation = { type: 'resize end', index: edge.endindex, delta: 0 }
                       hub.emit('update', { operation, selectedindex: null })
                       window.addEventListener('keypress', cancelifesc)
-                      return
                     }
-                    if (edge.startindex != null) {
-                      operation = {
-                        type: 'resize start',
-                        index: edge.startindex,
-                        delta: 0
-                      }
+                    else if (edge.startindex != null) {
+                      operation = { type: 'resize start', index: edge.startindex, delta: 0 }
                       hub.emit('update', { operation, selectedindex: null })
                       window.addEventListener('keypress', cancelifesc)
-                      return
                     }
                     return
                   }
                   const index = findRangeIndex(x)
                   if (index != null) {
-                    operation = {
-                      type: 'move',
-                      index,
-                      delta: 0
-                    }
+                    operation = { type: 'move', index, delta: 0 }
                     hub.emit('update', { operation, selectedindex: null })
                     window.addEventListener('keypress', cancelifesc)
                     return
                   }
-                  operation = {
-                    type: 'new',
-                    start: p2x(x),
-                    delta: 0
-                  }
+                  operation = {  type: 'new', start: p2x(x), delta: 0 }
                   hub.emit('update', { operation, selectedindex: null })
                   window.addEventListener('keypress', cancelifesc)
                 },
@@ -130,19 +112,17 @@ export default component({
                   const selectedindex = findRangeIndex(p[0])
                   if (selectedindex != null)
                     hub.emit('update', { selectedindex })
+                  else
+                    hub.emit('update', { selectedindex: null })
                 },
                 leave: () => document.body.style.cursor = 'auto',
                 hover: p => {
                   const x = p.current[0]
-                  if (findEdge(x) != null) {
+                  if (findEdge(x) != null)
                     document.body.style.cursor = 'col-resize'
-                    return
-                  }
-                  if (findRangeIndex(x) != null) {
+                  else if (findRangeIndex(x) != null)
                     document.body.style.cursor = 'ew-resize'
-                    return
-                  }
-                  document.body.style.cursor = 'crosshair'
+                  else document.body.style.cursor = 'crosshair'
                 }
               })
             }
@@ -155,27 +135,19 @@ export default component({
       ])
     }
 
-    const operation = props.operation
-
-    const result = operate(dataset, operation)
-
-    const edges = getEdges(dataset).map(d => ({ x: x2p(d.start), ...d }))
-
-    const payload = {
-      dataset: result.dataset.map(range2p),
-      current: range2p(result.current)
-    }
+    const result = operate(dataset, props.operation)
+    const current = range2p(result.current)
 
     return h('#root', [
       h('.area', [
         h(putty),
-        ...payload.dataset.map((d, i) => h('.box', {
+        ...result.dataset.map(range2p).map((d, i) => h('.box', {
           style: { left: `${d.x1}px`, width: `${d.x2 - d.x1}px` }
         })),
         h('.box.selected', {
           style: {
-            left: `${payload.current.x1}px`,
-            width: `${payload.current.x2 - payload.current.x1}px`
+            left: `${current.x1}px`,
+            width: `${current.x2 - current.x1}px`
           }
         })
       ])
