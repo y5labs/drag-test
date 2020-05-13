@@ -9,10 +9,10 @@ const visible = {
   end: getUnixTime(parseISO('2020-04-04T12:00:00Z'))
 }
 const secondsInAPixel = 2 * 60
-const x2p = d => (d - visible.start) / secondsInAPixel
-const p2x = x => (x * secondsInAPixel) + visible.start
-const range2p = d => ({ x1: x2p(d.start), x2: x2p(d.end), ...d })
-const smallestincrement = 5 * 60
+const ts2px = d => (d - visible.start) / secondsInAPixel
+const px2ts = ts => (ts * secondsInAPixel) + visible.start
+const range2px = d => ({ ts1: ts2px(d.start), ts2: ts2px(d.end), ...d })
+const smallestincrement = 6 * 60
 const quant = ({ start, end }) => {
   start = Math.round(start / smallestincrement) * smallestincrement
   end = Math.round(end / smallestincrement) * smallestincrement
@@ -40,16 +40,16 @@ export default component({
   module,
   render: (h, { props, hub, state, route, router }) => {
     if (!props.operation) {
-      const ds = dataset.map(range2p)
-      const edges = getEdges(dataset).map(d => ({ x: x2p(d.start), ...d }))
-      const findEdge = x => {
-        for (const d of edges) if (Math.abs(d.x - x) <= 4) return d
+      const ds = dataset.map(range2px)
+      const edges = getEdges(dataset).map(d => ({ ts: ts2px(d.start), ...d }))
+      const findEdge = ts => {
+        for (const d of edges) if (Math.abs(d.ts - ts) <= 4) return d
         return null
       }
-      const findRangeIndex = x => {
+      const findRangeIndex = ts => {
         for (let i = 0; i < ds.length; i++) {
           const d = ds[i]
-          if (d.x1 < x && d.x2 > x) return i
+          if (d.ts1 < ts && d.ts2 > ts) return i
         }
         return null
       }
@@ -63,13 +63,13 @@ export default component({
         }
       }
       return h('#root', [
-        h('.area', { style: { width: `${x2p(visible.end)}px` } }, [
+        h('.area', { style: { width: `${ts2px(visible.end)}px` } }, [
           h(putty, {
             attrs: {
               hub: hub.child({
                 start: p => {
-                  const x = p.start[0]
-                  const edge = findEdge(x)
+                  const ts = p.start[0]
+                  const edge = findEdge(ts)
                   if (edge != null) {
                     if (edge.endindex != null) {
                       operation = { type: 'resize end', index: edge.endindex, delta: 0 }
@@ -83,14 +83,14 @@ export default component({
                     }
                     return
                   }
-                  const index = findRangeIndex(x)
+                  const index = findRangeIndex(ts)
                   if (index != null) {
                     operation = { type: 'move', index, delta: 0 }
                     hub.emit('update', { operation, selectedindex: null })
                     window.addEventListener('keypress', cancelifesc)
                     return
                   }
-                  operation = {  type: 'new', start: p2x(x), delta: 0 }
+                  operation = {  type: 'new', start: px2ts(ts), delta: 0 }
                   hub.emit('update', { operation, selectedindex: null })
                   window.addEventListener('keypress', cancelifesc)
                 },
@@ -124,10 +124,10 @@ export default component({
                 },
                 leave: () => document.body.style.cursor = 'auto',
                 hover: p => {
-                  const x = p.current[0]
-                  if (findEdge(x) != null)
+                  const ts = p.current[0]
+                  if (findEdge(ts) != null)
                     document.body.style.cursor = 'col-resize'
-                  else if (findRangeIndex(x) != null)
+                  else if (findRangeIndex(ts) != null)
                     document.body.style.cursor = 'ew-resize'
                   else document.body.style.cursor = 'crosshair'
                 }
@@ -136,25 +136,25 @@ export default component({
           }),
           ...ds.map((d, i) => h('.box', {
             class: { selected: i == props.selectedindex },
-            style: { left: `${d.x1}px`, width: `${d.x2 - d.x1}px` }
+            style: { left: `${d.ts1}px`, width: `${d.ts2 - d.ts1}px` }
           }))
         ])
       ])
     }
 
     const result = operate(dataset, props.operation, quant)
-    const current = range2p(result.current)
+    const current = range2px(result.current)
 
     return h('#root', [
       h('.area', [
         h(putty),
-        ...result.dataset.map(range2p).map((d, i) => h('.box', {
-          style: { left: `${d.x1}px`, width: `${d.x2 - d.x1}px` }
+        ...result.dataset.map(range2px).map((d, i) => h('.box', {
+          style: { left: `${d.ts1}px`, width: `${d.ts2 - d.ts1}px` }
         })),
         h('.box.selected', {
           style: {
-            left: `${current.x1}px`,
-            width: `${current.x2 - current.x1}px`
+            left: `${current.ts1}px`,
+            width: `${current.ts2 - current.ts1}px`
           }
         })
       ])
