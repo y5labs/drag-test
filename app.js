@@ -5,26 +5,33 @@ import { rangeSubtract, getEdges, operate } from './lib/range'
 
 
 const visible = {
-  start: getUnixTime(parseISO('2020-05-10T12:00:00Z')),
-  end: getUnixTime(parseISO('2020-05-11T12:00:00Z'))
+  start: getUnixTime(parseISO('2020-04-03T12:00:00Z')),
+  end: getUnixTime(parseISO('2020-04-04T12:00:00Z'))
 }
-const secondsInAPixel = 3 * 60
+const secondsInAPixel = 2 * 60
 const x2p = d => (d - visible.start) / secondsInAPixel
 const p2x = x => (x * secondsInAPixel) + visible.start
 const range2p = d => ({ x1: x2p(d.start), x2: x2p(d.end), ...d })
+const smallestincrement = 5 * 60
+const quant = ({ start, end }) => {
+  start = Math.round(start / smallestincrement) * smallestincrement
+  end = Math.round(end / smallestincrement) * smallestincrement
+  if (start == end) end += smallestincrement
+  return { start, end }
+}
 
 let dataset = [
   {
-    start: getUnixTime(parseISO('2020-05-10T23:00:00Z')),
-    end: getUnixTime(parseISO('2020-05-11T00:00:00Z'))
+    start: getUnixTime(parseISO('2020-04-03T23:00:00Z')),
+    end: getUnixTime(parseISO('2020-04-04T00:00:00Z'))
   },
   {
-    start: getUnixTime(parseISO('2020-05-11T01:00:00Z')),
-    end: getUnixTime(parseISO('2020-05-11T04:00:00Z'))
+    start: getUnixTime(parseISO('2020-04-04T01:00:00Z')),
+    end: getUnixTime(parseISO('2020-04-04T04:00:00Z'))
   },
   {
-    start: getUnixTime(parseISO('2020-05-11T04:00:00Z')),
-    end: getUnixTime(parseISO('2020-05-11T05:00:00Z'))
+    start: getUnixTime(parseISO('2020-04-04T04:00:00Z')),
+    end: getUnixTime(parseISO('2020-04-04T05:00:00Z'))
   }
 ]
 
@@ -94,7 +101,7 @@ export default component({
                 },
                 end: p => {
                   if (!operation) return
-                  const result = operate(dataset, operation)
+                  const result = operate(dataset, operation, quant)
                   dataset = result.dataset
                   let selectedindex = null
                   if (operation.type == 'resize start'
@@ -135,7 +142,7 @@ export default component({
       ])
     }
 
-    const result = operate(dataset, props.operation)
+    const result = operate(dataset, props.operation, quant)
     const current = range2p(result.current)
 
     return h('#root', [
