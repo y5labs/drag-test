@@ -1,6 +1,7 @@
 {
   "name": "yeahnah",
   "version": "1.0.0",
+  "private": true,
   "description": "UseIT",
   "main": "index.js",
   "scripts": {
@@ -12,7 +13,7 @@
     "url": "git+https://github.com/tcoats/yeahnah.git"
   },
   "author": "Thomas Coats <github@voodoolabs.net>",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/tcoats/yeahnah/issues"
   },
