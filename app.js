@@ -165,7 +165,7 @@ export default component({
               },
               tap: p => {
                 const selectedindex = findRangeIndex(p[0])
-                if (selectedindex != null)
+                if (selectedindex != null && props.selectedindex != selectedindex)
                   hub.emit('update', { selectedindex })
                 else
                   hub.emit('update', { selectedindex: null })
