@@ -11,6 +11,6 @@ module.exports = merge(base, {
   ],
   devServer: {
     host: '0.0.0.0',
-    contentBase: './dist'
+    contentBase: './docs'
   }
 })

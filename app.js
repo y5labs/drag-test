@@ -116,7 +116,7 @@ export default component({
           h(putty, {
             on: {
               start: p => {
-                const ts = p.start[0]
+                const ts = p[0]
                 const edge = findEdge(ts)
                 if (edge != null) {
                   if (edge.endindex != null) {
@@ -170,12 +170,8 @@ export default component({
                 else
                   hub.emit('update', { selectedindex: null })
               },
-              leave: () => {
-                document.body.style.cursor = 'auto'
-                hub.emit('update', { hoverts: null })
-              },
               hover: p => {
-                const px = p.current[0]
+                const px = p[0]
                 if (findEdge(px) != null)
                   document.body.style.cursor = 'col-resize'
                 else if (findRangeIndex(px) != null)
@@ -183,6 +179,10 @@ export default component({
                 else
                   document.body.style.cursor = 'crosshair'
                 hub.emit('update', { hoverts: px2ts(px) })
+              },
+              leave: () => {
+                document.body.style.cursor = 'auto'
+                hub.emit('update', { hoverts: null })
               }
             }
           }),
@@ -208,7 +208,7 @@ export default component({
     const current = range2px(result.current)
 
     return h('#root', [
-      h('.area', [
+      h('.area', { style: { width: `${ts2px(visible.end)}px` } }, [
         h(putty),
         ...result.dataset.map(range2px).map((d, i) => h('.box', {
           style: { left: `${d.ts1}px`, width: `${d.ts2 - d.ts1}px` }

@@ -1,7 +1,5 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
 import Router from 'vue-router'
-import { sync } from 'vuex-router-sync'
 import Hub from 'seacreature/lib/hub'
 import inject from 'seacreature/lib/inject'
 
@@ -10,16 +8,6 @@ import inject from 'seacreature/lib/inject'
 Vue.config.devtools = false
 Vue.config.productionTip = false
 
-// Stores via modules
-// https://vuex.vuejs.org/guide/modules.html
-Vue.use(Vuex)
-const modules = {}
-for (let module of inject.many('store'))
-  modules[module.name] = module
-const store = new Vuex.Store({
-  strict: process.env.NODE_ENV !== 'production',
-  modules
-})
 
 // Routes
 Vue.use(Router)
@@ -32,9 +20,6 @@ const router = new Router({
   },
   base: process.env.BASE_URL
 })
-
-// Sync
-sync(store, router)
 
 // TODO: Support CSRF with Express
 // // Setup axios with CSRF protection
@@ -63,7 +48,7 @@ Vue.use({
 // launch Vue
 const props = {}
 const scene = new Vue({
-  router, store, hub, render: h =>
+  router, hub, render: h =>
     h('router-view', { props: props })
 })
 
@@ -79,7 +64,6 @@ hub.on('reset', (p) => {
 // an opportunity for functional components to query
 router.beforeResolve((route, from, next) => {
   const queryctx = {
-    state: store.state,
     route,
     hub,
     props,
@@ -97,7 +81,7 @@ router.afterEach((to, from) => hub.emit('reset'))
 
 
 // Dispatch to many pods
-const podctx = { store, router, hub, scene, props }
+const podctx = { router, hub, scene, props }
 
 for (let c of inject.many('ctx')) Object.assign(podctx, await c(podctx))
 for (let pod of inject.many('pod')) await pod(podctx)
