@@ -86,7 +86,7 @@ let dataset = [
 export default component({
   name: 'app',
   module,
-  render: (h, { props, hub, state, route, router }) => {
+  render: (h, { props, hub }) => {
     if (!props.operation) {
       const ds = dataset.map(range2px)
       const selected = props.selectedindex != null ? dataset[props.selectedindex] : null

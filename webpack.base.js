@@ -18,7 +18,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new HtmlPlugin({ template: './index.html', chunksSortMode: 'dependency' }),
+    new HtmlPlugin({ template: './index.html' }),
     new VueLoaderPlugin()
   ]
 }
