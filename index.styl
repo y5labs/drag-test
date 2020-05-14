@@ -1,7 +1,5 @@
 @require "./node_modules/normalize.css/normalize.css"
 
-*
-  box-sizing border-box
 
 body
   margin 0
@@ -9,6 +7,9 @@ body
   background black
   color white
   font-size 16px
+
+.area
+  position relative
 
 .putty
   height 20px
@@ -23,5 +24,20 @@ body
   &.selected
     background-color #999
 
-.area
-  position relative
+.start,
+.end,
+.hover
+  position absolute
+  top: 20px
+  font-size 10px
+  font-family monospace
+  padding 2px
+  width 50px
+
+.start
+  text-align right
+  margin-left -53px
+
+.hover
+  text-align center
+  margin-left -27px
