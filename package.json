@@ -2,11 +2,11 @@
   "name": "yeahnah",
   "version": "1.0.0",
   "private": true,
-  "description": "UseIT",
+  "description": "Drag Test",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./webpack.development.js",
-    "build": "cross-env NODE_ENV=production webpack --config ./webpack.production.js"
+    "dev": "cross-env NODE_ENV=development NODE_OPTIONS=\"--trace-warnings\" webpack-dev-server --config ./webpack.development.js",
+    "build": "cross-env NODE_ENV=production NODE_OPTIONS=\"--trace-warnings\" webpack --config ./webpack.production.js"
   },
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-hot-middleware": "^2.25.0",
     "webpack-merge": "^4.2.2",
-    "date-fns": "^2.13.0",
+    "date-fns": "^2.14.0",
     "date-fns-lost": "^1.0.0",
     "date-fns-tz": "^1.0.10",
     "seacreature": "^2.2.0",
