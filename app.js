@@ -1,143 +1,214 @@
 import component from './component'
 import putty from 'vue-putty'
-import { linear, linearFromExtents, quant, lerp, nearestExp } from './scratch'
+import {
+  linear,
+  linearFromExtents,
+  quant,
+  lerp,
+  nearestExp,
+  mod
+} from './scratch'
 
-import { getUnixTime, fromUnixTime } from 'date-fns'
-import { format, utcToZonedTime, toDate } from 'date-fns-tz'
-import locale from 'date-fns/locale/en-GB'
-const fmt = (d, timeZone) =>
-  format(utcToZonedTime(d, timeZone), 'HH:mm', { timeZone, locale })
+const cursorIncr = Math.PI / 8
+const cursorBreaks = [
+  [1 * cursorIncr, 'ew-resize'],
+  [3 * cursorIncr, 'nwse-resize'],
+  [5 * cursorIncr, 'ns-resize'],
+  [7 * cursorIncr, 'nesw-resize'],
+  [9 * cursorIncr, 'ew-resize'],
+  [11 * cursorIncr, 'nwse-resize'],
+  [13 * cursorIncr, 'ns-resize'],
+  [15 * cursorIncr, 'nesw-resize']
+]
+const cursorBreak = rad => {
+  for (const b of cursorBreaks)
+    if (b[0] > rad) return b[1]
+  return cursorBreaks[0][1]
+}
+
+const epsilon = 0.00001
+const quantincr = Math.PI / 16
+const modRad = rad => mod(rad, 2 * Math.PI)
+const modRadHalf = rad =>
+  modRad(rad + Math.PI) - Math.PI
+const isnear = (a, b) =>
+  Math.abs(modRad(b) - modRad(a)) < quantincr
 
 
-const secondsPerPixel = 2 * 60
-const quantincr = 5 * 60
-const isnear = (a, b) => Math.abs(b - a) < 8 * 60
+const center = 50
+const radius = 50
+const unit = linearFromExtents([-1, 1], [center - radius, center + radius])
+const xy2rad = (x, y) =>
+  (Math.atan2(y, x) + 2.5 * Math.PI) % (2 * Math.PI)
+const rad2xy = rad =>
+  [Math.sin(rad), -Math.cos(rad)]
+const xy2px = (pos, f = 1) => {
+  const scale = f == 1 ? unit : linearFromExtents([-1, 1], [
+    center - radius * f,
+    center + radius * f
+  ])
+  return `${scale(pos[0]).toFixed(2)} ${scale(pos[1]).toFixed(2)}`
+}
 
 export default component({
   name: 'app',
   module,
   render: (h, { props, hub }) => {
-    const domain = {
-      from: props.domain_from
-        || getUnixTime(toDate('2020-04-05T00:00:00', 'Pacific/Auckland')),
-      until: props.domain_until
-        || getUnixTime(toDate('2020-04-06T00:00:00', 'Pacific/Auckland'))
-    }
-    const scale = linearFromExtents(
-      [domain.from, domain.until],
-      [0, (domain.until - domain.from) / secondsPerPixel])
-    const range_width = scale(domain.until) - scale(domain.from)
     let operation = props.operation
     const apply_operation = selected => {
       if (!operation) return selected
       selected = { ...selected }
-      if (operation.type == 'from')
-        selected.from += operation.delta
-      else if (operation.type == 'until')
-        selected.until += operation.delta
+      if (operation.type == 'anchor') {
+        selected.anchor += operation.delta
+        selected.range -= operation.delta
+      }
+      else if (operation.type == 'range') {
+        const anchor = selected.anchor + selected.range
+        const range = -selected.range
+        selected.anchor = anchor + operation.delta
+        selected.range = range - operation.delta
+      }
       else if (operation.type == 'move') {
-        selected.from += operation.delta
-        selected.until += operation.delta
+        selected.anchor += operation.delta
       } else if (operation.type == 'new') {
-        selected.from = operation.start
-        selected.until = operation.current
-      } if (selected.from > selected.until)
-        [selected.from, selected.until] =
-          [selected.until, selected.from]
-      selected.from = quant(quantincr).round(selected.from)
-      selected.until = quant(quantincr).round(selected.until)
-      if (selected.from == selected.until)
-        selected.until += quantincr
-      if (selected.from < domain.from)
-        selected.from = domain.from
-      if (selected.until > domain.until)
-        selected.until = domain.until
+        selected.anchor = operation.start
+        selected.range = operation.delta
+      }
+      selected.anchor = quant(quantincr).round(selected.anchor)
+      selected.range = quant(quantincr).round(selected.range)
+      selected.anchor = modRad(selected.anchor)
+      while (selected.range + epsilon >= 2 * Math.PI)
+        selected.range -= 2 * Math.PI
+      while (selected.range - epsilon <= - 2 * Math.PI)
+        selected.range += 2 * Math.PI
+      if (selected.range == 0)
+        selected.range = quantincr
       return selected
     }
     const selected = apply_operation({
-      from: props.selected_from,
-      until: props.selected_until
+      anchor: props.selected_anchor,
+      range: props.selected_range
     })
-
     return h('#root', [
-      h('.area', { style: { width: `${range_width}px` } }, [
+      h('.area', { style: {
+        width: '100px',
+        height: '100px'
+      } }, [
         h(putty, {
           on: {
             start: p => {
-              const current = scale.inv(p[0])
-              if (selected.from) {
-                if (isnear(selected.from, current)) {
-                  operation = { type: 'from', delta: 0 }
+              const x = unit.inv(p[0])
+              const y = unit.inv(p[1])
+              const current = xy2rad(x, y)
+              if (selected.anchor != null) {
+                if (isnear(selected.anchor, current)) {
+                  operation = {
+                    type: 'anchor',
+                    start: current,
+                    delta: 0
+                  }
                   return hub.emit('update', { operation })
                 }
-                else if (isnear(selected.until, current)) {
-                  operation = { type: 'until', delta: 0 }
+                else if (isnear(selected.anchor + selected.range, current)) {
+                  operation = {
+                    type: 'range',
+                    start: current,
+                    delta: 0
+                  }
                   return hub.emit('update', { operation })
                 }
-                else if (selected.from < current && selected.until > current) {
-                  operation = { type: 'move', delta: 0 }
-                  return hub.emit('update', { operation })
+                else {
+                  const rel = modRadHalf(current - selected.anchor)
+                  if (selected.range > 0) {
+                    if (rel > 0 && rel < selected.range) {
+                      operation = {
+                        type: 'move',
+                        start: current,
+                        delta: 0
+                      }
+                      return hub.emit('update', { operation })
+                    }
+                  }
+                  else if (rel < 0 && rel > selected.range) {
+                    operation = {
+                      type: 'move',
+                      start: current,
+                      delta: 0
+                    }
+                    return hub.emit('update', { operation })
+                  }
                 }
               }
               const start = quant(quantincr).round(current)
               operation = {
                 type: 'new',
                 start,
-                current: start,
                 delta: 0
               }
               hub.emit('update', { operation })
             },
             move: p => {
+              const x = unit.inv(p.current[0])
+              const y = unit.inv(p.current[1])
+              const current = xy2rad(x, y)
+              const cursor = cursorBreak(current)
+              document.body.style.cursor = cursor
               if (!operation) return
-              operation.delta = p.delta[0] * secondsPerPixel
-              operation.current = quant(quantincr).round(
-                scale.inv(p.current[0]))
+
+              const delta = modRadHalf(current - operation.start)
+              operation.delta = delta
               hub.emit('update', { operation })
             },
             end: p => {
               const selected = apply_operation({
-                from: props.selected_from,
-                until: props.selected_until
+                anchor: props.selected_anchor,
+                range: props.selected_range
               })
               hub.emit('update', {
                 operation: null,
-                selected_from: selected.from,
-                selected_until: selected.until
+                selected_anchor: selected.anchor,
+                selected_range: selected.range
               })
             },
             tap: p => {
-              hub.emit('update', { selected: null })
+              hub.emit('update', {
+                selected_anchor: null,
+                selected_range: null
+              })
             },
             hover: p => {
-              const current = scale.inv(p[0])
-              document.body.style.cursor = 'crosshair'
-              if (selected.from) {
-                if (isnear(selected.from, current)
-                  || isnear(selected.until, current))
-                  document.body.style.cursor = 'col-resize'
-                else if (selected.from < current && selected.until > current)
-                  document.body.style.cursor = 'ew-resize'
-                else
-                  document.body.style.cursor = 'crosshair'
-              }
+              const x = unit.inv(p[0])
+              const y = unit.inv(p[1])
+              const current = xy2rad(x, y)
+              const cursor = cursorBreak(current)
+              document.body.style.cursor = cursor
             },
             leave: () => {
               document.body.style.cursor = 'auto'
             }
           }
         }),
-          ...(selected.from ? [
-            h('.box.selected', {
-              style: {
-                left: `${scale(selected.from)}px`,
-                width: `${scale(selected.until) - scale(selected.from)}px` }
-            }),
-            h('.start', { style: { left: `${scale(selected.from)}px` } },
-              fmt(fromUnixTime(selected.from), 'Pacific/Auckland')),
-            h('.end', { style: { left: `${scale(selected.until)}px`  } },
-              fmt(fromUnixTime(selected.until), 'Pacific/Auckland'))
-          ] : [])
+        h('svg', { style: {
+          width: '100px',
+          height: '100px'
+        } }, [
+          ...(selected.anchor != null ? (() => {
+            const from = rad2xy(selected.anchor)
+            const until = rad2xy(selected.anchor + selected.range)
+            const islarge = selected.range > Math.PI
+              || selected.range < -Math.PI
+            const issweep = selected.range > 0
+            return [
+              h('path.segment', { attrs: { d: `
+                M ${xy2px(from)}
+                A ${center} ${center} 0 ${islarge ? '1' : '0'} ${issweep ? '1' : '0'} ${xy2px(until)}
+                L ${xy2px(until, 0.8)}
+                A ${center * 0.8} ${center * 0.8} 0 ${islarge ? '1' : '0'} ${issweep ? '0' : '1'} ${xy2px(from, 0.8)}
+                Z
+              ` } })
+            ]
+          })() : [])
+        ])
       ])
     ])
   }

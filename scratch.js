@@ -33,11 +33,13 @@ const nearestExp = {
   floor: (value, exp) => _nearestExp('floor', value, exp),
   ceil: (value, exp) => _nearestExp('ceil', value, exp)
 }
+const mod = (n, r) => ((n % r) + r) % r
 
 export {
   linear,
   linearFromExtents,
   quant,
   lerp,
-  nearestExp
+  nearestExp,
+  mod
 }
