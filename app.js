@@ -36,7 +36,8 @@ const isnear = (a, b) =>
 
 
 const center = 50
-const radius = 50
+const radius = 45
+const innerRadius = 35
 const unit = linearFromExtents([-1, 1], [center - radius, center + radius])
 const xy2rad = (x, y) =>
   (Math.atan2(y, x) + 2.5 * Math.PI) % (2 * Math.PI)
@@ -47,7 +48,7 @@ const xy2px = (pos, f = 1) => {
     center - radius * f,
     center + radius * f
   ])
-  return `${scale(pos[0]).toFixed(2)} ${scale(pos[1]).toFixed(2)}`
+  return `${scale(pos[0]).toFixed(3)} ${scale(pos[1]).toFixed(3)}`
 }
 
 export default component({
@@ -118,11 +119,12 @@ export default component({
                   return hub.emit('update', { operation })
                 }
                 else {
+                  let rel = current
+                  while (rel > selected.anchor) rel -= 2 * Math.PI
                   if (selected.range > 0) {
-                    let rel = current
-                    while (rel > selected.anchor) rel -= 2 * Math.PI
                     rel += 2 * Math.PI
-                    if (rel - selected.anchor < selected.range) {
+                    if (rel > selected.anchor
+                      && rel < selected.anchor + selected.range) {
                       operation = {
                         type: 'move',
                         start: current,
@@ -131,17 +133,14 @@ export default component({
                       return hub.emit('update', { operation })
                     }
                   }
-                  else {
-                    let rel = current
-                    while (rel > selected.anchor) rel -= 2 * Math.PI
-                    if (rel > selected.range) {
-                      operation = {
-                        type: 'move',
-                        start: current,
-                        delta: 0
-                      }
-                      return hub.emit('update', { operation })
+                  else if (rel < selected.anchor
+                    && rel > selected.anchor + selected.range) {
+                    operation = {
+                      type: 'move',
+                      start: current,
+                      delta: 0
                     }
+                    return hub.emit('update', { operation })
                   }
                 }
               }
@@ -208,12 +207,13 @@ export default component({
             const islarge = selected.range > Math.PI
               || selected.range < -Math.PI
             const issweep = selected.range > 0
+            const radiusRatio = innerRadius / radius
             return [
               h('path.segment', { attrs: { d: `
                 M ${xy2px(from)}
-                A ${center} ${center} 0 ${islarge ? '1' : '0'} ${issweep ? '1' : '0'} ${xy2px(until)}
-                L ${xy2px(until, 0.8)}
-                A ${center * 0.8} ${center * 0.8} 0 ${islarge ? '1' : '0'} ${issweep ? '0' : '1'} ${xy2px(from, 0.8)}
+                A ${radius} ${radius} 0 ${islarge ? '1' : '0'} ${issweep ? '1' : '0'} ${xy2px(until)}
+                L ${xy2px(until, radiusRatio)}
+                A ${innerRadius} ${innerRadius} 0 ${islarge ? '1' : '0'} ${issweep ? '0' : '1'} ${xy2px(from, radiusRatio)}
                 Z
               ` } })
             ]
