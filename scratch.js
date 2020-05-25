@@ -16,24 +16,29 @@ const quant = incr => ({
   floor: x => Math.floor(x / incr) * incr
 })
 const lerp = (v0, v1, t) => v0 * (1 - t) + v1 * t
-const _nearestExp = (type, value, exp) => {
+const _nearestExp = (fn, value, exp) => {
   if (typeof exp === 'undefined' || +exp == 0)
-    return Math[type](value)
+    return fn(value)
   value = +value
   exp = +exp
   if (isNaN(value) || !(typeof exp === 'number' && exp % 1 == 0))
     return NaN
   value = value.toString().split('e')
-  value = Math[type](+(value[0] + 'e' + (value[1] ? +value[1] - exp : -exp)))
+  value = fn(+(value[0] + 'e' + (value[1] ? +value[1] - exp : -exp)))
   value = value.toString().split('e')
   return +(value[0] + 'e' + (value[1] ? +value[1] + exp : exp))
 }
 const nearestExp = {
-  round: (value, exp) => _nearestExp('round', value, exp),
-  floor: (value, exp) => _nearestExp('floor', value, exp),
-  ceil: (value, exp) => _nearestExp('ceil', value, exp)
+  round: (value, exp) => _nearestExp(Math.round, value, exp),
+  floor: (value, exp) => _nearestExp(Math.floor, value, exp),
+  ceil: (value, exp) => _nearestExp(Math.ceil, value, exp)
 }
 const mod = (n, r) => ((n % r) + r) % r
+const breaks = (breaks, x) => {
+  for (const b of breaks)
+    if (b[0] > x) return b[1]
+  return breaks[0][1]
+}
 
 export {
   linear,
@@ -41,5 +46,6 @@ export {
   quant,
   lerp,
   nearestExp,
-  mod
+  mod,
+  breaks
 }

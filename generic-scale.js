@@ -108,7 +108,10 @@ export default component({
               })
             },
             tap: p => {
-              hub.emit('update', { selected: null })
+              hub.emit('update', {
+                selected_from: null,
+                selected_until: null
+              })
             },
             hover: p => {
               const current = scale.inv(p[0])

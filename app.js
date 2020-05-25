@@ -6,7 +6,8 @@ import {
   quant,
   lerp,
   nearestExp,
-  mod
+  mod,
+  breaks
 } from './scratch'
 
 const cursorIncr = Math.PI / 8
@@ -20,11 +21,7 @@ const cursorBreaks = [
   [13 * cursorIncr, 'ns-resize'],
   [15 * cursorIncr, 'nesw-resize']
 ]
-const cursorBreak = rad => {
-  for (const b of cursorBreaks)
-    if (b[0] > rad) return b[1]
-  return cursorBreaks[0][1]
-}
+const cursorBreak = rad => breaks(cursorBreaks, rad)
 
 const epsilon = 0.00001
 const quantincr = Math.PI / 16
@@ -91,10 +88,7 @@ export default component({
       range: props.selected_range
     })
     return h('#root', [
-      h('.area', { style: {
-        width: '100px',
-        height: '100px'
-      } }, [
+      h('.area', { style: { width: '100px', height: '100px' } }, [
         h(putty, {
           on: {
             start: p => {
@@ -103,19 +97,11 @@ export default component({
               const current = xy2rad(x, y)
               if (selected.anchor != null) {
                 if (isnear(selected.anchor, current)) {
-                  operation = {
-                    type: 'anchor',
-                    start: current,
-                    delta: 0
-                  }
+                  operation = { type: 'anchor', start: current, delta: 0 }
                   return hub.emit('update', { operation })
                 }
                 else if (isnear(selected.anchor + selected.range, current)) {
-                  operation = {
-                    type: 'range',
-                    start: current,
-                    delta: 0
-                  }
+                  operation = { type: 'range', start: current, delta: 0 }
                   return hub.emit('update', { operation })
                 }
                 else {
@@ -125,39 +111,26 @@ export default component({
                     rel += 2 * Math.PI
                     if (rel > selected.anchor
                       && rel < selected.anchor + selected.range) {
-                      operation = {
-                        type: 'move',
-                        start: current,
-                        delta: 0
-                      }
+                      operation = { type: 'move', start: current, delta: 0 }
                       return hub.emit('update', { operation })
                     }
                   }
                   else if (rel < selected.anchor
                     && rel > selected.anchor + selected.range) {
-                    operation = {
-                      type: 'move',
-                      start: current,
-                      delta: 0
-                    }
+                    operation = { type: 'move', start: current, delta: 0 }
                     return hub.emit('update', { operation })
                   }
                 }
               }
               const start = quant(quantincr).round(current)
-              operation = {
-                type: 'new',
-                start,
-                delta: 0
-              }
+              operation = { type: 'new', start, delta: 0 }
               hub.emit('update', { operation })
             },
             move: p => {
               const x = unit.inv(p.current[0])
               const y = unit.inv(p.current[1])
               const current = xy2rad(x, y)
-              const cursor = cursorBreak(current)
-              document.body.style.cursor = cursor
+              document.body.style.cursor = cursorBreak(current)
               if (!operation) return
 
               let delta = modRadHalf(current - operation.start)
@@ -180,27 +153,19 @@ export default component({
               })
             },
             tap: p => {
-              hub.emit('update', {
-                selected_anchor: null,
-                selected_range: null
-              })
+              hub.emit('update', { selected_anchor: null, selected_range: null })
             },
             hover: p => {
-              const x = unit.inv(p[0])
-              const y = unit.inv(p[1])
-              const current = xy2rad(x, y)
-              const cursor = cursorBreak(current)
-              document.body.style.cursor = cursor
+              document.body.style.cursor = cursorBreak(xy2rad(
+                unit.inv(p[0]),
+                unit.inv(p[1])))
             },
             leave: () => {
               document.body.style.cursor = 'auto'
             }
           }
         }),
-        h('svg', { style: {
-          width: '100px',
-          height: '100px'
-        } }, [
+        h('svg', { style: { width: '100px', height: '100px' } }, [
           ...(selected.anchor != null ? (() => {
             const from = rad2xy(selected.anchor)
             const until = rad2xy(selected.anchor + selected.range)
@@ -211,9 +176,15 @@ export default component({
             return [
               h('path.segment', { attrs: { d: `
                 M ${xy2px(from)}
-                A ${radius} ${radius} 0 ${islarge ? '1' : '0'} ${issweep ? '1' : '0'} ${xy2px(until)}
+                A ${radius} ${radius}
+                  0 ${islarge ? '1' : '0'}
+                  ${issweep ? '1' : '0'}
+                  ${xy2px(until)}
                 L ${xy2px(until, radiusRatio)}
-                A ${innerRadius} ${innerRadius} 0 ${islarge ? '1' : '0'} ${issweep ? '0' : '1'} ${xy2px(from, radiusRatio)}
+                A ${innerRadius} ${innerRadius}
+                  0 ${islarge ? '1' : '0'}
+                  ${issweep ? '0' : '1'}
+                  ${xy2px(from, radiusRatio)}
                 Z
               ` } })
             ]
