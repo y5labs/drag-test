@@ -118,9 +118,11 @@ export default component({
                   return hub.emit('update', { operation })
                 }
                 else {
-                  const rel = modRadHalf(current - selected.anchor)
                   if (selected.range > 0) {
-                    if (rel > 0 && rel < selected.range) {
+                    let rel = current
+                    while (rel > selected.anchor) rel -= 2 * Math.PI
+                    rel += 2 * Math.PI
+                    if (rel - selected.anchor < selected.range) {
                       operation = {
                         type: 'move',
                         start: current,
@@ -129,13 +131,17 @@ export default component({
                       return hub.emit('update', { operation })
                     }
                   }
-                  else if (rel < 0 && rel > selected.range) {
-                    operation = {
-                      type: 'move',
-                      start: current,
-                      delta: 0
+                  else {
+                    let rel = current
+                    while (rel > selected.anchor) rel -= 2 * Math.PI
+                    if (rel > selected.range) {
+                      operation = {
+                        type: 'move',
+                        start: current,
+                        delta: 0
+                      }
+                      return hub.emit('update', { operation })
                     }
-                    return hub.emit('update', { operation })
                   }
                 }
               }
@@ -155,7 +161,11 @@ export default component({
               document.body.style.cursor = cursor
               if (!operation) return
 
-              const delta = modRadHalf(current - operation.start)
+              let delta = modRadHalf(current - operation.start)
+              if (operation.delta > Math.PI / 2 && delta < 0 / 2)
+                delta += 2 * Math.PI
+              else if (operation.delta < -Math.PI / 2 && delta > 0 / 2)
+                delta -= 2 * Math.PI
               operation.delta = delta
               hub.emit('update', { operation })
             },
