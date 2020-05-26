@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Hub from 'seacreature/lib/hub'
-import app from './app'
+import app from './app.vue'
 
 Vue.config.devtools = false
 Vue.config.productionTip = false
@@ -21,9 +21,22 @@ Vue.use({
   }
 })
 
+import Vuex from 'vuex'
+Vue.use(Vuex)
+import store from './store'
+
 // launch Vue
 const props = {}
-const scene = new Vue({ hub, render: h => h(app, { props: props }) })
+const scene = new Vue({
+  hub,
+  store: new Vuex.Store({
+    strict: process.env.NODE_ENV !== 'production',
+    modules: {
+      [store.name]: store
+    }
+  }),
+  render: h => h(app, { props: props })
+})
 
 // Unidirectional data flow
 hub.on('update', (p) => {
