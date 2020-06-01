@@ -7,11 +7,20 @@
     </ul>
     <button @click="filter">filter</button>
     <button @click="unfilter">unfilter</button>
+    <brush-radial v-bind="brushRadialProps" />
+    <brush-linear v-bind="brushLinearProps" />
   </div>
 </template>
 
 <script>
-module.exports = {
+import brushRadial from './brush-radial'
+import brushLinear from './brush-linear'
+
+export default {
+  components: {
+    brushRadial,
+    brushLinear
+  },
   mounted() {
     this.$store.dispatch('analytics/products_load')
     // or await...
@@ -32,6 +41,26 @@ module.exports = {
       return Array.from(
         this.$store.state.analytics.products.by_name.filtered(Infinity),
         x => x[1])
+    },
+    brushRadialProps() {
+      return {
+        ...this.$store.state.params.radial,
+        hub: this.$hub.child({
+          update: p => {
+            return this.$hub.emit('update', { radial: p })
+          }
+        })
+      }
+    },
+    brushLinearProps() {
+      return {
+        ...this.$store.state.params.linear,
+        hub: this.$hub.child({
+          update: p => {
+            return this.$hub.emit('update', { linear: p })
+          }
+        })
+      }
     }
   }
 };

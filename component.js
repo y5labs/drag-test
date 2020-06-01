@@ -8,6 +8,8 @@ export default ({name, query, render, module}) => {
     query: query,
     render: (h, ctx) => {
       return render(hyperscript(h), {
+        state: ctx.parent.$store.state,
+        params: ctx.parent.$store.state.params,
         route: ctx.parent.$route,
         router: ctx.parent.$router,
         hub: ctx.props.hub || ctx.data.hub || ctx.parent.$hub,

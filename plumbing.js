@@ -23,25 +23,25 @@ Vue.use({
 
 import Vuex from 'vuex'
 Vue.use(Vuex)
-import store from './store'
+import analytics from './analytics'
+import params from './params'
 
 // launch Vue
-const props = {}
+const props = { }
+const store = new Vuex.Store({
+  strict: process.env.NODE_ENV !== 'production',
+  modules: {
+    [analytics.name]: analytics,
+    params
+  }
+})
 const scene = new Vue({
   hub,
-  store: new Vuex.Store({
-    strict: process.env.NODE_ENV !== 'production',
-    modules: {
-      [store.name]: store
-    }
-  }),
-  render: h => h(app, { props: props })
+  store,
+  render: h => h(app)
 })
 
 // Unidirectional data flow
-hub.on('update', (p) => {
-  Object.assign(props, p)
-  return scene.$forceUpdate()
-})
+hub.on('update', p => { store.commit('params/update', p) })
 
 scene.$mount('#root')

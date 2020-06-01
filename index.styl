@@ -1,17 +1,22 @@
 @require "./node_modules/normalize.css/normalize.css"
 
+$background = #272730
+$elevated = #41414C
+$subtle = #898992
+$primary = #5666F3
+$highlight = #00F5FF
 
 body
   margin 0
   padding 0
-  background black
+  background $background
   color white
   font-size 16px
 
 .area
   height 20px
   position relative
-  background-color #222
+  background-color $elevated
 
 .putty
   position absolute
@@ -23,14 +28,13 @@ body
 
 .box
   position absolute
-  border-left 2px solid black
-  border-right 2px solid black
-  background-color #444
+  border 2px solid $highlight
+  // border-right 2px solid $highlight
   top 0px
-  height 20px
+  height 16px
   pointer-events none
   &.selected
-    background-color #999
+    background-color transparent
 
 .start,
 .end,
@@ -41,6 +45,7 @@ body
   font-family monospace
   padding 2px
   width 50px
+  color $highlight
 
 .start
   text-align right
@@ -51,6 +56,6 @@ body
   margin-left -27px
 
 svg path.segment
-  fill #444
-  stroke black
+  fill transparent
+  stroke $highlight
   stroke-width 2

@@ -69,15 +69,15 @@ export default component({
               if (selected.from != null) {
                 if (isnear(selected.from, current)) {
                   operation = { type: 'from', delta: 0 }
-                  return hub.emit('update', { operation })
+                  return hub.emit('update', { operation: Object.assign({}, operation) })
                 }
                 else if (isnear(selected.until, current)) {
                   operation = { type: 'until', delta: 0 }
-                  return hub.emit('update', { operation })
+                  return hub.emit('update', { operation: Object.assign({}, operation) })
                 }
                 else if (selected.from < current && selected.until > current) {
                   operation = { type: 'move', delta: 0 }
-                  return hub.emit('update', { operation })
+                  return hub.emit('update', { operation: Object.assign({}, operation) })
                 }
               }
               const start = quant(quantincr).round(current)
@@ -87,14 +87,14 @@ export default component({
                 current: start,
                 delta: 0
               }
-              hub.emit('update', { operation })
+              hub.emit('update', { operation: Object.assign({}, operation) })
             },
             move: p => {
               if (!operation) return
               operation.delta = p.delta[0] * secondsPerPixel
               operation.current = quant(quantincr).round(
                 scale.inv(p.current[0]))
-              hub.emit('update', { operation })
+              hub.emit('update', { operation: Object.assign({}, operation) })
             },
             end: p => {
               const selected = apply_operation({

@@ -48,10 +48,10 @@ const xy2px = (pos, f = 1) => {
   return `${scale(pos[0]).toFixed(3)} ${scale(pos[1]).toFixed(3)}`
 }
 
-export default component({
+const brushRadial = component({
   name: 'app',
   module,
-  render: (h, { props, hub }) => {
+  render: (h, { props, state, hub }) => {
     let operation = props.operation
     const apply_operation = selected => {
       if (!operation) return selected
@@ -98,11 +98,11 @@ export default component({
               if (selected.anchor != null) {
                 if (isnear(selected.anchor, current)) {
                   operation = { type: 'anchor', start: current, delta: 0 }
-                  return hub.emit('update', { operation })
+                  return hub.emit('update', { operation: Object.assign({}, operation) })
                 }
                 else if (isnear(selected.anchor + selected.range, current)) {
                   operation = { type: 'range', start: current, delta: 0 }
-                  return hub.emit('update', { operation })
+                  return hub.emit('update', { operation: Object.assign({}, operation) })
                 }
                 else {
                   let rel = current
@@ -112,19 +112,19 @@ export default component({
                     if (rel > selected.anchor
                       && rel < selected.anchor + selected.range) {
                       operation = { type: 'move', start: current, delta: 0 }
-                      return hub.emit('update', { operation })
+                      return hub.emit('update', { operation: Object.assign({}, operation) })
                     }
                   }
                   else if (rel < selected.anchor
                     && rel > selected.anchor + selected.range) {
                     operation = { type: 'move', start: current, delta: 0 }
-                    return hub.emit('update', { operation })
+                    return hub.emit('update', { operation: Object.assign({}, operation) })
                   }
                 }
               }
               const start = quant(quantincr).round(current)
               operation = { type: 'new', start, delta: 0 }
-              hub.emit('update', { operation })
+              hub.emit('update', { operation: Object.assign({}, operation) })
             },
             move: p => {
               const x = unit.inv(p.current[0])
@@ -139,7 +139,7 @@ export default component({
               else if (operation.delta < -Math.PI / 2 && delta > 0 / 2)
                 delta -= 2 * Math.PI
               operation.delta = delta
-              hub.emit('update', { operation })
+              hub.emit('update', { operation: Object.assign({}, operation) })
             },
             end: p => {
               const selected = apply_operation({
@@ -194,3 +194,5 @@ export default component({
     ])
   }
 })
+
+export default brushRadial
