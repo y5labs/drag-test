@@ -9,17 +9,20 @@
     <button @click="unfilter">unfilter</button>
     <brush-radial v-bind="brushRadialProps" />
     <brush-linear v-bind="brushLinearProps" />
+    <chop-lines />
   </div>
 </template>
 
 <script>
 import brushRadial from './brush-radial'
 import brushLinear from './brush-linear'
+import chopLines from './chop-lines'
 
 export default {
   components: {
     brushRadial,
-    brushLinear
+    brushLinear,
+    chopLines
   },
   mounted() {
     this.$store.dispatch('analytics/products_load')
