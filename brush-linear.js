@@ -108,6 +108,7 @@ export default component({
               })
             },
             tap: p => {
+              document.body.style.cursor = 'crosshair'
               hub.emit('update', {
                 selected_from: null,
                 selected_until: null
