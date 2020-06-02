@@ -40,7 +40,7 @@ const xy2rad = (x, y) =>
   (Math.atan2(y, x) + 2.5 * Math.PI) % (2 * Math.PI)
 const rad2xy = rad =>
   [Math.sin(rad), -Math.cos(rad)]
-const rad2deg = rad => (rad / Math.PI * 180 + 360) % 360
+const rad2deg = rad => (rad / Math.PI * 180 + 360 + epsilon) % 360
 const xy2px = (pos, f = 1) => {
   const scale = f == 1 ? unit : linearFromExtents([-1, 1], [
     center - radius * f,
@@ -176,35 +176,38 @@ const brushRadial = component({
               || selected.range < -Math.PI
             const issweep = selected.range > 0
             const radiusRatio = innerRadius / radius
+            const isafter =
+              (selected.range > 0 && (selected.range < 1.5 * Math.PI - epsilon))
+              || (selected.range < 0 && (selected.range < -1.5 * Math.PI + epsilon)) ? true : false
             return [
               h('g', { attrs: {
                 transform: `translate(${center} ${center})`
               } }, [
                 from_deg > 180
                 ? h('text.label', { attrs: {
-                    dx: -innerRadius + 2,
-                    'alignment-baseline': 'middle',
+                    dx: -innerRadius + 4,
+                    'alignment-baseline': isafter ? 'baseline' : 'alphabetic',
                     'text-anchor': 'start',
                     transform: `rotate(${from_deg + 90})`
                   }}, `${from_deg}°`)
                 : h('text.label', { attrs: {
-                    dx: innerRadius - 2,
-                    'alignment-baseline': 'middle',
+                    dx: innerRadius - 4,
+                    'alignment-baseline': isafter ? 'alphabetic' : 'baseline',
                     'text-anchor': 'end',
                     transform: `rotate(${from_deg - 90})`
                   }}, `${from_deg}°`),
-                Math.abs(selected.range) <= quantincr * 3
+                Math.abs(selected.range) < quantincr * 1
                 ? null
                 : until_deg > 180
                 ? h('text.label', { attrs: {
-                    dx: -innerRadius + 2,
-                    'alignment-baseline': 'middle',
+                    dx: -innerRadius + 4,
+                    'alignment-baseline': isafter ? 'alphabetic' : 'baseline',
                     'text-anchor': 'start',
                     transform: `rotate(${until_deg + 90})`
                   }}, `${until_deg}°`)
                 : h('text.label', { attrs: {
-                    dx: innerRadius - 2,
-                    'alignment-baseline': 'middle',
+                    dx: innerRadius - 4,
+                    'alignment-baseline': isafter ? 'baseline' : 'alphabetic',
                     'text-anchor': 'end',
                     transform: `rotate(${until_deg - 90})`
                   }}, `${until_deg}°`)
