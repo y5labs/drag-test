@@ -2,7 +2,7 @@
   <div>
     <svg :width="width" :height="height">
       <path v-for="c in paths"
-        class="segment"
+        class="line"
         :class="c.class"
         :d="c.path" />
     </svg>
@@ -12,7 +12,7 @@
 <script>
 import {
   linearFromExtents,
-  sliceArea,
+  sliceLine,
   quant
 } from './scratch'
 
@@ -20,7 +20,7 @@ export default {
   data() {
     return {
       values: [
-        null, 5, 6, 5, null, 3, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
+        null, null, 5, 6, 5, null, null, 3, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
       ],
       scaleBreak: [
         [2.3, { level: 0, class: 'red'}],
@@ -47,7 +47,7 @@ export default {
         [0, quant(10).ceil(Math.max.apply(null, this.values))], [this.height, 0])
     },
     points() {
-      return sliceArea(this.scaleBreak, 0, this.values)
+      return sliceLine(this.scaleBreak, this.values)
     },
     paths() {
       return this.points.map(c => ({
@@ -56,7 +56,6 @@ export default {
           M ${this.xy2px(c.points[0][0], c.points[0][1])}
           ${c.points.slice(1).map(d =>
             `L ${this.xy2px(d[0], d[1])}`)}
-          Z
         `
       }))
     }

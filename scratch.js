@@ -52,6 +52,7 @@ const sliceArea = (scaleBreak, bottom, data) => {
   initialise(i)
   i++
   const finalise = i => {
+    if (stack == null) return
     while (stack.length > 0) {
       const base = stack.length > 1 ? scaleBreak[stack.length - 2][0] : bottom
       const points = stack.pop()
@@ -64,11 +65,17 @@ const sliceArea = (scaleBreak, bottom, data) => {
   }
   while (i < data.length) {
     let d = data[i]
-    while (d == null && i < data.length) {
+    if (d == null) {
       finalise(i - 1)
-      initialise(i + 1)
-      i += 2
-      d = data[i]
+      while (d == null && i < data.length) {
+        i++
+        d = data[i]
+      }
+      if (i < data.length) {
+        initialise(i)
+        i++
+        d = data[i]
+      }
       continue
     }
     let level = breaks(scaleBreak, d).level
@@ -116,11 +123,17 @@ const sliceLine = (scaleBreak, data) => {
   }
   while (i < data.length) {
     let d = data[i]
-    while (d == null && i < data.length) {
+    if (d == null) {
       finalise(i - 1)
-      initialise(i + 1)
-      i += 2
-      d = data[i]
+      while (d == null && i < data.length) {
+        i++
+        d = data[i]
+      }
+      if (i < data.length) {
+        initialise(i)
+        i++
+        d = data[i]
+      }
       continue
     }
     let level = breaks(scaleBreak, d).level
