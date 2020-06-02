@@ -14,7 +14,7 @@ body
   font-size 16px
 
 .area
-  height 20px
+  height 12px
   position relative
   background-color $elevated
   .putty
@@ -30,10 +30,10 @@ body
 
 .box
   position absolute
-  border 2px solid $highlight
+  border 1px solid $highlight
   // border-right 2px solid $highlight
   top 0px
-  height 16px
+  height 10px
   pointer-events none
   &.selected
     background-color transparent
@@ -42,7 +42,7 @@ body
 .end,
 .hover
   position absolute
-  top: 20px
+  top: 12px
   font-size 10px
   font-family monospace
   padding 2px
@@ -57,10 +57,10 @@ body
   text-align center
   margin-left -27px
 
-svg path.segment
+path.segment
   fill transparent
   stroke $highlight
-  stroke-width 2
+  stroke-width 1
   &.red
     fill red
     stroke none
@@ -73,3 +73,14 @@ svg path.segment
   &.purple
     fill purple
     stroke none
+path.line
+  fill transparent
+  stroke-width 1
+  &.red
+    stroke red
+  &.blue
+    stroke blue
+  &.green
+    stroke green
+  &.purple
+    stroke purple

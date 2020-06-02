@@ -10,6 +10,7 @@
     <brush-radial v-bind="brushRadialProps" />
     <brush-linear v-bind="brushLinearProps" />
     <chop-lines />
+    <slice-line />
   </div>
 </template>
 
@@ -17,12 +18,14 @@
 import brushRadial from './brush-radial'
 import brushLinear from './brush-linear'
 import chopLines from './chop-lines'
+import sliceLine from './slice-line.vue'
 
 export default {
   components: {
     brushRadial,
     brushLinear,
-    chopLines
+    chopLines,
+    sliceLine
   },
   mounted() {
     this.$store.dispatch('analytics/products_load')
