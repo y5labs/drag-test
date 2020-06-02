@@ -193,7 +193,9 @@ const brushRadial = component({
                     'text-anchor': 'end',
                     transform: `rotate(${from_deg - 90})`
                   }}, `${from_deg}°`),
-                until_deg > 180
+                selected.range < quantincr * 2
+                ? null
+                : until_deg > 180
                 ? h('text.label', { attrs: {
                     dx: -innerRadius + 2,
                     'alignment-baseline': 'middle',
