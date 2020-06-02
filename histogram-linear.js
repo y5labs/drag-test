@@ -11,7 +11,7 @@ export default component({
     const width = 400
     const height = 200
     const values = [
-      null, null, 5, 6, 5, null, null, 3, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
+      null, null, 5, 6, 5, null, 3, null, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
     ]
     const bar_width_total = width / values.length
     const bar_width = (bar_width_total * 0.9).toFixed(0)

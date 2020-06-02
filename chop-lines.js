@@ -20,7 +20,8 @@ export default component({
     const values = [
       null, null, 5, 6, 5, null, 3, null, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
     ]
-    const x = linearFromExtents([0, values.length - 1], [0, width])
+    const gap = width / values.length / 2
+    const x = linearFromExtents([0, values.length], [gap, width + gap])
     const y = linearFromExtents([0, quant(10).ceil(Math.max.apply(null, values))], [height, 0])
     const xy2px = (x1, y1) => `${x(x1).toFixed(1)} ${y(y1).toFixed(1)}`
     const points = sliceArea(scaleBreak, 0, values)
