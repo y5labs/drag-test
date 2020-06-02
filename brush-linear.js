@@ -1,6 +1,6 @@
 import component from './component'
 import putty from 'vue-putty'
-import { linear, linearFromExtents, quant } from './scratch'
+import { linearFromExtents, quant } from './math'
 
 import { getUnixTime, fromUnixTime } from 'date-fns'
 import { format, utcToZonedTime, toDate } from 'date-fns-tz'
@@ -60,90 +60,88 @@ export default component({
       until: props.selected_until
     })
 
-    return h('#root', [
-      h('.area', { style: { width: `${range_width}px` } }, [
-        h(putty, {
-          on: {
-            start: p => {
-              const current = scale.inv(p[0])
-              if (selected.from != null) {
-                if (isnear(selected.from, current)) {
-                  operation = { type: 'from', delta: 0 }
-                  return hub.emit('update', { operation: Object.assign({}, operation) })
-                }
-                else if (isnear(selected.until, current)) {
-                  operation = { type: 'until', delta: 0 }
-                  return hub.emit('update', { operation: Object.assign({}, operation) })
-                }
-                else if (selected.from < current && selected.until > current) {
-                  operation = { type: 'move', delta: 0 }
-                  return hub.emit('update', { operation: Object.assign({}, operation) })
-                }
+    return h('.area', { style: { width: `${range_width}px` } }, [
+      h(putty, {
+        on: {
+          start: p => {
+            const current = scale.inv(p[0])
+            if (selected.from != null) {
+              if (isnear(selected.from, current)) {
+                operation = { type: 'from', delta: 0 }
+                return hub.emit('update', { operation: Object.assign({}, operation) })
               }
-              const start = quant(quantincr).round(current)
-              operation = {
-                type: 'new',
-                start,
-                current: start,
-                delta: 0
+              else if (isnear(selected.until, current)) {
+                operation = { type: 'until', delta: 0 }
+                return hub.emit('update', { operation: Object.assign({}, operation) })
               }
-              hub.emit('update', { operation: Object.assign({}, operation) })
-            },
-            move: p => {
-              if (!operation) return
-              operation.delta = p.delta[0] * secondsPerPixel
-              operation.current = quant(quantincr).round(
-                scale.inv(p.current[0]))
-              hub.emit('update', { operation: Object.assign({}, operation) })
-            },
-            end: p => {
-              const selected = apply_operation({
-                from: props.selected_from,
-                until: props.selected_until
-              })
-              hub.emit('update', {
-                operation: null,
-                selected_from: selected.from,
-                selected_until: selected.until
-              })
-            },
-            tap: p => {
-              document.body.style.cursor = 'crosshair'
-              hub.emit('update', {
-                selected_from: null,
-                selected_until: null
-              })
-            },
-            hover: p => {
-              const current = scale.inv(p[0])
-              document.body.style.cursor = 'crosshair'
-              if (selected.from) {
-                if (isnear(selected.from, current)
-                  || isnear(selected.until, current))
-                  document.body.style.cursor = 'col-resize'
-                else if (selected.from < current && selected.until > current)
-                  document.body.style.cursor = 'ew-resize'
-                else
-                  document.body.style.cursor = 'crosshair'
+              else if (selected.from < current && selected.until > current) {
+                operation = { type: 'move', delta: 0 }
+                return hub.emit('update', { operation: Object.assign({}, operation) })
               }
-            },
-            leave: () => {
-              document.body.style.cursor = 'auto'
             }
+            const start = quant(quantincr).round(current)
+            operation = {
+              type: 'new',
+              start,
+              current: start,
+              delta: 0
+            }
+            hub.emit('update', { operation: Object.assign({}, operation) })
+          },
+          move: p => {
+            if (!operation) return
+            operation.delta = p.delta[0] * secondsPerPixel
+            operation.current = quant(quantincr).round(
+              scale.inv(p.current[0]))
+            hub.emit('update', { operation: Object.assign({}, operation) })
+          },
+          end: p => {
+            const selected = apply_operation({
+              from: props.selected_from,
+              until: props.selected_until
+            })
+            hub.emit('update', {
+              operation: null,
+              selected_from: selected.from,
+              selected_until: selected.until
+            })
+          },
+          tap: p => {
+            document.body.style.cursor = 'crosshair'
+            hub.emit('update', {
+              selected_from: null,
+              selected_until: null
+            })
+          },
+          hover: p => {
+            const current = scale.inv(p[0])
+            document.body.style.cursor = 'crosshair'
+            if (selected.from) {
+              if (isnear(selected.from, current)
+                || isnear(selected.until, current))
+                document.body.style.cursor = 'col-resize'
+              else if (selected.from < current && selected.until > current)
+                document.body.style.cursor = 'ew-resize'
+              else
+                document.body.style.cursor = 'crosshair'
+            }
+          },
+          leave: () => {
+            document.body.style.cursor = 'auto'
           }
-        }),
-          ...(selected.from != null ? [
-            h('.box.selected', {
-              style: {
-                left: `${scale(selected.from)}px`,
-                width: `${scale(selected.until) - scale(selected.from)}px` }
-            }),
-            h('.start', { style: { left: `${scale(selected.from)}px` } },
-              fmt(fromUnixTime(selected.from), 'Pacific/Auckland')),
-            h('.end', { style: { left: `${scale(selected.until)}px`  } },
-              fmt(fromUnixTime(selected.until), 'Pacific/Auckland'))
-          ] : [])
-      ])
+        }
+      }),
+        ...(selected.from != null ? [
+          h('.box.selected', {
+            style: {
+              left: `${scale(selected.from)}px`,
+              width: `${scale(selected.until) - scale(selected.from)}px` }
+          }),
+          h('.start', { style: { left: `${scale(selected.from)}px` } },
+            fmt(fromUnixTime(selected.from), 'Pacific/Auckland')),
+          h('.end', { style: { left: `${scale(selected.until)}px`  } },
+            fmt(fromUnixTime(selected.until), 'Pacific/Auckland'))
+        ] : [])
     ])
   }
 })

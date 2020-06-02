@@ -9,23 +9,26 @@
     <button @click="unfilter">unfilter</button>
     <brush-radial v-bind="brushRadialProps" />
     <brush-linear v-bind="brushLinearProps" />
-    <!--<chop-lines /> -->
-    <slice-line />
+    <histogram-linear />
+    <histogram-radial />
+    <chop-lines />
   </div>
 </template>
 
 <script>
 import brushRadial from './brush-radial'
 import brushLinear from './brush-linear'
+import histogramLinear from './histogram-linear'
+import histogramRadial from './histogram-radial'
 import chopLines from './chop-lines'
-import sliceLine from './slice-line.vue'
 
 export default {
   components: {
     brushRadial,
     brushLinear,
-    chopLines,
-    sliceLine
+    histogramLinear,
+    histogramRadial,
+    chopLines
   },
   mounted() {
     this.$store.dispatch('analytics/products_load')

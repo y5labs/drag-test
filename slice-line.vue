@@ -14,7 +14,7 @@ import {
   linearFromExtents,
   sliceLine,
   quant
-} from './scratch'
+} from './math'
 
 export default {
   data() {
