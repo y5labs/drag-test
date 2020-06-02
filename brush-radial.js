@@ -40,6 +40,7 @@ const xy2rad = (x, y) =>
   (Math.atan2(y, x) + 2.5 * Math.PI) % (2 * Math.PI)
 const rad2xy = rad =>
   [Math.sin(rad), -Math.cos(rad)]
+const rad2deg = rad => (rad / Math.PI * 180 + 360) % 360
 const xy2px = (pos, f = 1) => {
   const scale = f == 1 ? unit : linearFromExtents([-1, 1], [
     center - radius * f,
@@ -168,12 +169,44 @@ const brushRadial = component({
         h('svg', { style: { width: '100px', height: '100px' } }, [
           ...(selected.anchor != null ? (() => {
             const from = rad2xy(selected.anchor)
+            const from_deg = Number(rad2deg(selected.anchor).toFixed(0))
             const until = rad2xy(selected.anchor + selected.range)
+            const until_deg = Number(rad2deg(selected.anchor + selected.range).toFixed(0))
             const islarge = selected.range > Math.PI
               || selected.range < -Math.PI
             const issweep = selected.range > 0
             const radiusRatio = innerRadius / radius
             return [
+              h('g', { attrs: {
+                transform: `translate(${center} ${center})`
+              } }, [
+                from_deg > 180
+                ? h('text.label', { attrs: {
+                    dx: -innerRadius + 2,
+                    'alignment-baseline': 'middle',
+                    'text-anchor': 'start',
+                    transform: `rotate(${from_deg + 90})`
+                  }}, `${from_deg}°`)
+                : h('text.label', { attrs: {
+                    dx: innerRadius - 2,
+                    'alignment-baseline': 'middle',
+                    'text-anchor': 'end',
+                    transform: `rotate(${from_deg - 90})`
+                  }}, `${from_deg}°`),
+                until_deg > 180
+                ? h('text.label', { attrs: {
+                    dx: -innerRadius + 2,
+                    'alignment-baseline': 'middle',
+                    'text-anchor': 'start',
+                    transform: `rotate(${until_deg + 90})`
+                  }}, `${until_deg}°`)
+                : h('text.label', { attrs: {
+                    dx: innerRadius - 2,
+                    'alignment-baseline': 'middle',
+                    'text-anchor': 'end',
+                    transform: `rotate(${until_deg - 90})`
+                  }}, `${until_deg}°`)
+              ]),
               h('path.segment', { attrs: { d: `
                 M ${xy2px(from)}
                 A ${radius} ${radius}
