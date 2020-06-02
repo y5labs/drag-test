@@ -20,7 +20,7 @@ export default {
   data() {
     return {
       values: [
-        5, 6, 5, 4, 3, 2, 2, 3, 4, 4, 5, 5, 5, 6, 6, 7, 8
+        null, 5, 6, 5, null, 3, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
       ],
       scaleBreak: [
         [2.3, { level: 0, class: 'red'}],

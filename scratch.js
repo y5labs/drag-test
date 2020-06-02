@@ -41,18 +41,42 @@ const breaks = (breaks, x) => {
 }
 const sliceArea = (scaleBreak, bottom, data) => {
   const result = []
-  const stack = [...Array(breaks(scaleBreak, data[0]).level).keys()]
-    .map(i => [[0, scaleBreak[i][0]]])
-  stack.push([[0, data[0]]])
-  let i = 1
+  let i = 0
+  let stack = null
+  while (data[i] == null && i < data.length) i++
+  const initialise = i => {
+    stack = [...Array(breaks(scaleBreak, data[i]).level).keys()]
+      .map(j => [[i, scaleBreak[j][0]]])
+    stack.push([[i, data[i]]])
+  }
+  initialise(i)
+  i++
+  const finalise = i => {
+    while (stack.length > 0) {
+      const base = stack.length > 1 ? scaleBreak[stack.length - 2][0] : bottom
+      const points = stack.pop()
+      points.push([i, points[points.length - 1][1]])
+      points.push([i, base])
+      points.push([points[0][0], base])
+      result.push({ level: stack.length, points })
+    }
+    stack = null
+  }
   while (i < data.length) {
     let d = data[i]
+    while (d == null && i < data.length) {
+      finalise(i - 1)
+      initialise(i + 1)
+      i += 2
+      d = data[i]
+      continue
+    }
     let level = breaks(scaleBreak, d).level
     // climb into scale, creating as we go.
     while (stack.length <= level) {
       const start = data[i - 1]
       const scale = scaleBreak[stack.length - 1][0] - start
-      const point = [i - 1 + scale, start + scale / (d - start)]
+      const point = [i - 1 + scale / (d - start), start + scale]
       stack[stack.length - 1].push(point)
       stack.push([point])
     }
@@ -60,7 +84,7 @@ const sliceArea = (scaleBreak, bottom, data) => {
     while (stack.length > level + 1) {
       const start = data[i - 1]
       const scale = start - scaleBreak[stack.length - 2][0]
-      const point = [i - 1 + scale, start - scale / (start - d)]
+      const point = [i - 1 + scale / (start - d), start - scale]
       stack[stack.length - 1].push(point)
       const points = stack.pop()
       points.push([points[0][0], scaleBreak[stack.length - 1][0]])
@@ -70,29 +94,41 @@ const sliceArea = (scaleBreak, bottom, data) => {
     stack[stack.length - 1].push([i, d])
     i++
   }
-  while (stack.length > 0) {
-    const base = stack.length > 1 ? scaleBreak[stack.length - 2][0] : bottom
-    const points = stack.pop()
-    points.push([data.length - 1, points[points.length - 1][1]])
-    points.push([data.length - 1, base])
-    points.push([points[0][0], base])
-    result.push({ level: stack.length, points })
-  }
+  finalise(data.length - 1)
   return result
 }
 const sliceLine = (scaleBreak, data) => {
   const result = []
-  let current = breaks(scaleBreak, data[0]).level
-  let points = [[0, data[0]]]
-  let i = 1
+  let i = 0
+  let current = null
+  let points = null
+  while (data[i] == null && i < data.length) i++
+  const initialise = i => {
+    current = breaks(scaleBreak, data[i]).level
+    points = [[i, data[i]]]
+  }
+  initialise(i)
+  i++
+  const finalise = i => {
+    if (points) result.push({ level: current, points })
+    current = null
+    points = null
+  }
   while (i < data.length) {
     let d = data[i]
+    while (d == null && i < data.length) {
+      finalise(i - 1)
+      initialise(i + 1)
+      i += 2
+      d = data[i]
+      continue
+    }
     let level = breaks(scaleBreak, d).level
     // climb into scale, creating as we go.
     while (current < level) {
       const start = data[i - 1]
       const scale = scaleBreak[current][0] - start
-      const point = [i - 1 + scale, start + scale / (d - start)]
+      const point = [i - 1 + scale / (d - start), start + scale]
       points.push(point)
       result.push({ level: current, points })
       points = [point]
@@ -102,7 +138,7 @@ const sliceLine = (scaleBreak, data) => {
     while (current > level) {
       const start = data[i - 1]
       const scale = start - scaleBreak[current - 1][0]
-      const point = [i - 1 + scale, start - scale / (start - d)]
+      const point = [i - 1 + scale / (start - d), start - scale]
       points.push(point)
       result.push({ level: current, points })
       points = [point]
@@ -111,7 +147,7 @@ const sliceLine = (scaleBreak, data) => {
     points.push([i, d])
     i++
   }
-  result.push({ level: current, points })
+  finalise(data.length - 1)
   return result
 }
 

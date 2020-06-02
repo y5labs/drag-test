@@ -9,7 +9,7 @@
     <button @click="unfilter">unfilter</button>
     <brush-radial v-bind="brushRadialProps" />
     <brush-linear v-bind="brushLinearProps" />
-    <chop-lines />
+    <!--<chop-lines /> -->
     <slice-line />
   </div>
 </template>
