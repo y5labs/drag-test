@@ -46,19 +46,28 @@ const sliceArea = (scaleBreak, bottom, data) => {
   while (data[i] == null && i < data.length) i++
   const initialise = i => {
     stack = [...Array(breaks(scaleBreak, data[i]).level).keys()]
-      .map(j => [[i, scaleBreak[j][0]]])
-    stack.push([[i, data[i]]])
+      .map(j => {
+        const base = j > 0 ? scaleBreak[j - 1][0] : bottom
+        return [
+          [i, base],
+          [i, scaleBreak[j][0]]
+        ]
+      })
+    const base = stack.length > 0 ? scaleBreak[stack.length - 1][0] : bottom
+    stack.push([
+      [i, base],
+      [i, data[i]]
+    ])
   }
   initialise(i)
   i++
   const finalise = i => {
     if (stack == null) return
     while (stack.length > 0) {
-      const base = stack.length > 1 ? scaleBreak[stack.length - 2][0] : bottom
       const points = stack.pop()
+      const base = stack.length > 0 ? scaleBreak[stack.length - 1][0] : bottom
       points.push([i, points[points.length - 1][1]])
       points.push([i, base])
-      points.push([points[0][0], base])
       result.push({ level: stack.length, points })
     }
     stack = null
@@ -85,7 +94,9 @@ const sliceArea = (scaleBreak, bottom, data) => {
       const scale = scaleBreak[stack.length - 1][0] - start
       const point = [i - 1 + scale / (d - start), start + scale]
       stack[stack.length - 1].push(point)
-      stack.push([point])
+      stack.push([
+        point
+      ])
     }
     // descend out of scales
     while (stack.length > level + 1) {

@@ -33,7 +33,6 @@ export default component({
           M ${xy2px(c.points[0][0], c.points[0][1])}
           ${c.points.slice(1).map(d =>
             `L ${xy2px(d[0], d[1])}`)}
-          Z
         ` }
       } ))
     ])
