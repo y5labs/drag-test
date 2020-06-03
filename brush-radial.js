@@ -85,6 +85,26 @@ export default component({
       anchor: props.selected_anchor,
       range: props.selected_range
     })
+    if (selected.anchor != null) {
+      const rad2deg = rad => rad / Math.PI * 180
+      const moddeg = deg => mod(deg, 360)
+      const quantdeg = quant(1).round
+      const splitselection = selected => {
+        const anchor1 = moddeg(rad2deg(selected.anchor))
+        const anchor2 = anchor1 + rad2deg(selected.range)
+        if (anchor2 < 0)
+          return [[0, anchor1], [moddeg(anchor2), 360]]
+        if (anchor2 > 0)
+          return [[anchor1, 360], [0, moddeg(anchor2)]]
+        return anchor1 < anchor2
+          ? [anchor1, moddeg(anchor2)]
+          : [moddeg(anchor2), anchor1]
+      }
+      const selections = splitselection(selected)
+        .map(([start, end]) =>
+          [quantdeg(start - epsilon), quantdeg(end + epsilon)])
+      // console.log(selections)
+    }
     return h('.area', { style: { width: '100px', height: '100px' } }, [
       h(putty, {
         on: {
