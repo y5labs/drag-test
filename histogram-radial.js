@@ -8,23 +8,16 @@ export default component({
   name: 'app',
   module,
   render: (h, { props, state, hub }) => {
-    const values = [
-      3, 1, 2, 3, 1, 7, 3, 2, null, 1, 6, 3, null, 9, 3, 2
-    ]
+    const display_radius = props.display_radius
+    const values = props.values
     const bar_width_total = 2 * Math.PI / values.length
-    const bar_width = bar_width_total * 0.9
+    const bar_portion = props.bar_portion || 0.9
+    const bar_width = bar_width_total * bar_portion
     const bar_offset = bar_width / 2
-    const center = 50
-    const radius = 50
-    const innerRadius = 30
     const rad2xy = rad => [Math.sin(rad), -Math.cos(rad)]
-    const xy2px = (pos, n) => {
-      const scale = linearFromExtents(
-        [-1, 1], [center - n, center + n])
-      return `${scale(pos[0]).toFixed(3)} ${scale(pos[1]).toFixed(3)}`
-    }
-    const y = linearFromExtents([0, quant(10).ceil(Math.max.apply(null, values))], [innerRadius, radius])
-    return h('svg', { style: { width: '100px', height: '100px' } }, [
+    const xy2px = (pos, n) => `${(n * pos[0]).toFixed(3)} ${(n * pos[1]).toFixed(3)}`
+    const y = linearFromExtents([0, quant(10).ceil(Math.max.apply(null, values))], [display_radius[0], display_radius[1]])
+    return h('g', [
       ...values.map((d, i) => {
         if (d == null) return null
         const rad = bar_width_total * i
@@ -36,10 +29,10 @@ export default component({
           A ${radius_d} ${radius_d}
             0 0 1
             ${xy2px(pos2, radius_d)}
-          L ${xy2px(pos2, innerRadius)}
-          A ${innerRadius} ${innerRadius}
+          L ${xy2px(pos2, display_radius[0])}
+          A ${display_radius[0]} ${display_radius[0]}
             0 0 0
-            ${xy2px(pos1, innerRadius)}
+            ${xy2px(pos1, display_radius[0])}
           Z
         ` } })
       })

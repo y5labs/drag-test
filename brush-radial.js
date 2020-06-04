@@ -1,7 +1,40 @@
 import component from './component'
 import { putty } from 'vue-putty'
-import { quant, mod, breaks } from './math'
+import { quant, mod, breaks, epsilon } from './math'
 
+// shared
+const apply_operation = (selected, operation, quantincr) => {
+  if (!operation) return selected
+  selected = { ...selected }
+  if (operation.type == 'anchor') {
+    selected.anchor += operation.delta
+    selected.range -= operation.delta
+  }
+  else if (operation.type == 'range') {
+    const anchor = selected.anchor + selected.range
+    const range = -selected.range
+    selected.anchor = anchor + operation.delta
+    selected.range = range - operation.delta
+  }
+  else if (operation.type == 'move') {
+    selected.anchor += operation.delta
+  } else if (operation.type == 'new') {
+    selected.anchor = operation.start
+    selected.range = operation.delta
+  }
+  selected.anchor = quant(quantincr).round(selected.anchor)
+  selected.range = quant(quantincr).round(selected.range)
+  selected.anchor = modRad(selected.anchor)
+  while (selected.range + epsilon >= 2 * Math.PI)
+    selected.range -= 2 * Math.PI
+  while (selected.range - epsilon <= - 2 * Math.PI)
+    selected.range += 2 * Math.PI
+  if (selected.range == 0)
+    selected.range = quantincr
+  return selected
+}
+
+// brush
 const cursorIncr = Math.PI / 8
 const cursorBreaks = [
   [1 * cursorIncr, 'ew-resize'],
@@ -14,20 +47,20 @@ const cursorBreaks = [
   [15 * cursorIncr, 'nesw-resize']
 ]
 const cursorBreak = rad => breaks(cursorBreaks, rad)
-const quantincr = Math.PI / 16
+const len = pos => Math.sqrt(pos[0] * pos[0] + pos[1] * pos[1])
+const xy2rad = pos =>
+  (Math.atan2(pos[1], pos[0]) + 2.5 * Math.PI) % (2 * Math.PI)
 const modRad = rad => mod(rad, 2 * Math.PI)
 const modRadHalf = rad =>
   modRad(rad + Math.PI) - Math.PI
-const isnear = (a, b) =>
-  Math.abs(modRad(b) - modRad(a)) < quantincr
-const xy2rad = pos =>
-  (Math.atan2(pos[1], pos[0]) + 2.5 * Math.PI) % (2 * Math.PI)
+
+// display
 const rad2xy = rad => [Math.sin(rad), -Math.cos(rad)]
-const epsilon = 0.00001
 const rad2degmod = rad => (rad / Math.PI * 180 + 360 + epsilon) % 360
 const xy2px = (pos, f = 1) =>
   `${(f * pos[0]).toFixed(3)} ${(f * pos[1]).toFixed(3)}`
-const len = pos => Math.sqrt(pos[0] * pos[0] + pos[1] * pos[1])
+
+// optional
 const rad2deg = rad => rad / Math.PI * 180
 const moddeg = deg => mod(deg, 360)
 const quantdeg = quant(1).round
@@ -47,45 +80,25 @@ export default component({
   name: 'app',
   module,
   render: (h, { props, state, hub }) => {
-    const offset = props.offset
-    const select_radius = props.select_radius
+    // shared
+    const quantincr = props.quantincr || Math.PI / 8
+
+    // display
     const display_radius = props.display_radius
+    const display_quant = props.display_quant != null
+      ? props.display_quant
+      : false
+
+    // brush
+    const select_radius = props.select_radius
+    const isnear = (a, b) =>
+      Math.abs(modRad(b) - modRad(a)) < quantincr
 
     let operation = props.operation
-    const apply_operation = selected => {
-      if (!operation) return selected
-      selected = { ...selected }
-      if (operation.type == 'anchor') {
-        selected.anchor += operation.delta
-        selected.range -= operation.delta
-      }
-      else if (operation.type == 'range') {
-        const anchor = selected.anchor + selected.range
-        const range = -selected.range
-        selected.anchor = anchor + operation.delta
-        selected.range = range - operation.delta
-      }
-      else if (operation.type == 'move') {
-        selected.anchor += operation.delta
-      } else if (operation.type == 'new') {
-        selected.anchor = operation.start
-        selected.range = operation.delta
-      }
-      selected.anchor = quant(quantincr).round(selected.anchor)
-      selected.range = quant(quantincr).round(selected.range)
-      selected.anchor = modRad(selected.anchor)
-      while (selected.range + epsilon >= 2 * Math.PI)
-        selected.range -= 2 * Math.PI
-      while (selected.range - epsilon <= - 2 * Math.PI)
-        selected.range += 2 * Math.PI
-      if (selected.range == 0)
-        selected.range = quantincr
-      return selected
-    }
     const selected = apply_operation({
       anchor: props.selected_anchor,
       range: props.selected_range
-    })
+    }, operation, quantincr)
     // TODO: use this for seacreature
     if (selected.anchor != null) {
       const selections = splitselection(selected)
@@ -93,17 +106,24 @@ export default component({
           [quantdeg(start - epsilon), quantdeg(end + epsilon)])
       // console.log(selections)
     }
-    return h('g', { attrs: { transform: `translate(${offset[0]} ${offset[1]})` } }, [
+    return h('g', [
       ...(selected.anchor != null ? (() => {
-        const from = rad2xy(selected.anchor)
+        const bump = display_quant
+          ? (selected.range > 0 ? -quantincr / 2 : quantincr / 2)
+          : 0
+        const quant_selected = {
+          anchor: selected.anchor + bump,
+          range: selected.range - 2 * bump
+        }
+        const from = rad2xy(quant_selected.anchor)
         const from_deg = Number(rad2degmod(selected.anchor).toFixed(0))
-        const until = rad2xy(selected.anchor + selected.range)
+        const until = rad2xy(quant_selected.anchor + quant_selected.range)
         const until_deg = Number(rad2degmod(selected.anchor + selected.range).toFixed(0))
-        const islarge = selected.range > Math.PI || selected.range < -Math.PI
-        const issweep = selected.range > 0
+        const islarge = quant_selected.range >= Math.PI || quant_selected.range <= -Math.PI
+        const issweep = quant_selected.range > 0
         const isafter =
-          (selected.range > 0 && (selected.range < 1.5 * Math.PI - epsilon))
-          || (selected.range < 0 && (selected.range < -1.5 * Math.PI + epsilon))
+          (quant_selected.range > 0 && (quant_selected.range < 1.5 * Math.PI - epsilon))
+          || (quant_selected.range < 0 && (quant_selected.range < -1.5 * Math.PI + epsilon))
         return [
           from_deg > 180
           ? h('text.label', { attrs: {
@@ -149,7 +169,7 @@ export default component({
         ]
       })() : []),
       h('rect', {
-        on: putty({ offset }, {
+        on: putty({ offset: [select_radius[1], select_radius[1]] }, {
           start: p => {
             const length = len(p)
             if (length > select_radius[1] || length < select_radius[0]) return
@@ -202,7 +222,7 @@ export default component({
             const selected = apply_operation({
               anchor: props.selected_anchor,
               range: props.selected_range
-            })
+            }, operation, quantincr)
             hub.emit('update', {
               operation: null,
               selected_anchor: selected.anchor,

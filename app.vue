@@ -8,11 +8,33 @@
     <button @click="filter">filter</button>
     <button @click="unfilter">unfilter</button>
     <svg width="300px" height="200px">
-      <brush-radial v-bind="brushRadialProps" />
+      <g transform="translate(75 75)">
+        <histogram-radial
+          :display_radius="[35, 60]"
+          :values="[
+            3, 1, 2, 3, 1, 7, 3, 2, null, 1, 6, 3, null, 9, 3, 2
+          ]"
+        />
+        <brush-radial
+          :select_radius="[0, 76]"
+          :display_radius="[35, 60]"
+          :display_quant="true"
+          v-bind="brushRadialProps"
+        />
+      </g>
+      <g transform="translate(100 0)">
+        <histogram-linear
+          :width="200"
+          :height="200"
+          :values="[
+            null, null, 5, 6, 5, null, 3, null, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
+          ]"
+        />
+      </g>
     </svg>
-    <brush-linear v-bind="brushLinearProps" />
-    <histogram-linear />
-    <histogram-radial />
+    <brush-linear
+      v-bind="brushLinearProps"
+    />
     <chop-lines />
   </div>
 </template>
@@ -55,9 +77,6 @@ export default {
     },
     brushRadialProps() {
       return {
-        offset: [50, 50],
-        select_radius: [0, 50],
-        display_radius: [35, 45],
         ...this.$store.state.params.radial,
         hub: this.$hub.child({
           update: p => this.$hub.emit('update', { radial: p })
@@ -66,7 +85,6 @@ export default {
     },
     brushLinearProps() {
       return {
-        offset: [0, 0],
         ...this.$store.state.params.linear,
         hub: this.$hub.child({
           update: p => this.$hub.emit('update', { linear: p })

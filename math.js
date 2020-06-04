@@ -1,3 +1,4 @@
+const epsilon = 0.00001
 const linear = (offset, factor) => {
   const fn = x => (x - offset) * factor
   fn.inv = x => (x / factor) + offset
@@ -176,6 +177,7 @@ const sliceLine = (scaleBreak, data) => {
 }
 
 export {
+  epsilon,
   linear,
   linearFromExtents,
   quant,
