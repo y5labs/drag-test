@@ -7,7 +7,9 @@
     </ul>
     <button @click="filter">filter</button>
     <button @click="unfilter">unfilter</button>
-    <brush-radial v-bind="brushRadialProps" />
+    <svg width="300px" height="200px">
+      <brush-radial v-bind="brushRadialProps" />
+    </svg>
     <brush-linear v-bind="brushLinearProps" />
     <histogram-linear />
     <histogram-radial />
@@ -53,21 +55,21 @@ export default {
     },
     brushRadialProps() {
       return {
+        offset: [50, 50],
+        select_radius: [0, 50],
+        display_radius: [35, 45],
         ...this.$store.state.params.radial,
         hub: this.$hub.child({
-          update: p => {
-            return this.$hub.emit('update', { radial: p })
-          }
+          update: p => this.$hub.emit('update', { radial: p })
         })
       }
     },
     brushLinearProps() {
       return {
+        offset: [0, 0],
         ...this.$store.state.params.linear,
         hub: this.$hub.child({
-          update: p => {
-            return this.$hub.emit('update', { linear: p })
-          }
+          update: p => this.$hub.emit('update', { linear: p })
         })
       }
     }
