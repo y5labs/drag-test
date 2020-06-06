@@ -9,21 +9,26 @@
     <button @click="unfilter">unfilter</button>
     <svg width="300px" height="200px">
       <g transform="translate(75 75)">
-        <histogram-radial
-          :display_radius="[35, 60]"
+        <radial-histogram
+          :radius="[35, 60]"
           :values="[
             3, 1, 2, 3, 1, 7, 3, 2, null, 1, 6, 3, null, 9, 3, 2
           ]"
         />
-        <brush-radial
-          :select_radius="[0, 76]"
-          :display_radius="[35, 60]"
+        <radial-selection
+          :radius="[35, 60]"
           :display_quant="true"
-          v-bind="brushRadialProps"
+          :quant_incr="Math.PI / 8"
+          v-bind="radialProps"
+        />
+        <radial-brush
+          :radius="[0, 76]"
+          :quant_incr="Math.PI / 8"
+          v-bind="radialProps"
         />
       </g>
       <g transform="translate(100 0)">
-        <histogram-linear
+        <linear-histogram
           :width="200"
           :height="200"
           :values="[
@@ -32,26 +37,28 @@
         />
       </g>
     </svg>
-    <brush-linear
-      v-bind="brushLinearProps"
+    <linear-brush
+      v-bind="linearProps"
     />
     <chop-lines />
   </div>
 </template>
 
 <script>
-import brushRadial from './brush-radial'
-import brushLinear from './brush-linear'
-import histogramLinear from './histogram-linear'
-import histogramRadial from './histogram-radial'
+import radialBrush from './radial/brush'
+import radialSelection from './radial/selection'
+import radialHistogram from './radial/histogram'
+import linearBrush from './linear/brush'
+import linearHistogram from './linear/histogram'
 import chopLines from './chop-lines'
 
 export default {
   components: {
-    brushRadial,
-    brushLinear,
-    histogramLinear,
-    histogramRadial,
+    radialBrush,
+    radialSelection,
+    radialHistogram,
+    linearBrush,
+    linearHistogram,
     chopLines
   },
   mounted() {
@@ -75,7 +82,7 @@ export default {
         this.$store.state.analytics.products.by_name.filtered(Infinity),
         x => x[1])
     },
-    brushRadialProps() {
+    radialProps() {
       return {
         ...this.$store.state.params.radial,
         hub: this.$hub.child({
@@ -83,7 +90,7 @@ export default {
         })
       }
     },
-    brushLinearProps() {
+    linearProps() {
       return {
         ...this.$store.state.params.linear,
         hub: this.$hub.child({

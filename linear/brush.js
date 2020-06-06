@@ -1,6 +1,6 @@
-import component from './component'
+import component from '../component'
 import putty from 'vue-putty'
-import { linearFromExtents, quant } from './math'
+import { linearFromExtents, quant } from '../math'
 
 import { getUnixTime, fromUnixTime } from 'date-fns'
 import { format, utcToZonedTime, toDate } from 'date-fns-tz'

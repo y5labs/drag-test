@@ -1,8 +1,8 @@
-import component from './component'
+import component from '../component'
 import {
   linearFromExtents,
   quant
-} from './math'
+} from '../math'
 
 export default component({
   name: 'app',
