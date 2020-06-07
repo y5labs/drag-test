@@ -35,11 +35,23 @@
             null, null, 5, 6, 5, null, 3, null, 2, 0, 3, 4, 4, 5, null, 5, 6, 6, 7, 8, null
           ]"
         />
+        <linear-selection
+          :domain="[0, 1000]"
+          :width="400"
+          :height="25"
+          :display_quant="true"
+          :quant_incr="10"
+          v-bind="linearProps"
+        />
+        <linear-brush
+          :domain="[0, 1000]"
+          :width="400"
+          :height="32"
+          :quant_incr="10"
+          v-bind="linearProps"
+        />
       </g>
     </svg>
-    <linear-brush
-      v-bind="linearProps"
-    />
     <chop-lines />
   </div>
 </template>
@@ -49,6 +61,7 @@ import radialBrush from './radial/brush'
 import radialSelection from './radial/selection'
 import radialHistogram from './radial/histogram'
 import linearBrush from './linear/brush'
+import linearSelection from './linear/selection'
 import linearHistogram from './linear/histogram'
 import chopLines from './chop-lines'
 
@@ -58,6 +71,7 @@ export default {
     radialSelection,
     radialHistogram,
     linearBrush,
+    linearSelection,
     linearHistogram,
     chopLines
   },
@@ -86,7 +100,7 @@ export default {
       return {
         ...this.$store.state.params.radial,
         hub: this.$hub.child({
-          update: p => this.$hub.emit('update', { radial: p })
+          update: radial => this.$hub.emit('update', { radial })
         })
       }
     },
@@ -94,7 +108,7 @@ export default {
       return {
         ...this.$store.state.params.linear,
         hub: this.$hub.child({
-          update: p => this.$hub.emit('update', { linear: p })
+          update: linear => this.$hub.emit('update', { linear })
         })
       }
     }

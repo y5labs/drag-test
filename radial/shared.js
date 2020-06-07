@@ -1,35 +1,35 @@
 import { quant, mod, breaks, epsilon } from '../math'
 
 // shared
-const apply_operation = (selected, operation, quantincr) => {
-  if (!operation) return selected
-  selected = { ...selected }
+const apply_operation = (selection, operation, quant_incr) => {
+  if (!operation) return selection
+  selection = { ...selection }
   if (operation.type == 'anchor') {
-    selected.anchor += operation.delta
-    selected.range -= operation.delta
+    selection.anchor += operation.delta
+    selection.range -= operation.delta
   }
   else if (operation.type == 'range') {
-    const anchor = selected.anchor + selected.range
-    const range = -selected.range
-    selected.anchor = anchor + operation.delta
-    selected.range = range - operation.delta
+    const anchor = selection.anchor + selection.range
+    const range = -selection.range
+    selection.anchor = anchor + operation.delta
+    selection.range = range - operation.delta
   }
   else if (operation.type == 'move') {
-    selected.anchor += operation.delta
+    selection.anchor += operation.delta
   } else if (operation.type == 'new') {
-    selected.anchor = operation.start
-    selected.range = operation.delta
+    selection.anchor = operation.start
+    selection.range = operation.delta
   }
-  selected.anchor = quant(quantincr).round(selected.anchor)
-  selected.range = quant(quantincr).round(selected.range)
-  selected.anchor = modRad(selected.anchor)
-  while (selected.range + epsilon >= 2 * Math.PI)
-    selected.range -= 2 * Math.PI
-  while (selected.range - epsilon <= - 2 * Math.PI)
-    selected.range += 2 * Math.PI
-  if (selected.range == 0)
-    selected.range = quantincr
-  return selected
+  selection.anchor = quant(quant_incr).round(selection.anchor)
+  selection.range = quant(quant_incr).round(selection.range)
+  selection.anchor = modRad(selection.anchor)
+  while (selection.range + epsilon >= 2 * Math.PI)
+    selection.range -= 2 * Math.PI
+  while (selection.range - epsilon <= - 2 * Math.PI)
+    selection.range += 2 * Math.PI
+  if (selection.range == 0)
+    selection.range = quant_incr
+  return selection
 }
 
 // brush
@@ -50,9 +50,9 @@ const xy2px = (pos, f = 1) =>
 const rad2deg = rad => rad / Math.PI * 180
 const moddeg = deg => mod(deg, 360)
 const quantdeg = quant(1).round
-const splitselection = selected => {
-  const anchor1 = moddeg(rad2deg(selected.anchor))
-  const anchor2 = anchor1 + rad2deg(selected.range)
+const splitselection = selection => {
+  const anchor1 = moddeg(rad2deg(selection.anchor))
+  const anchor2 = anchor1 + rad2deg(selection.range)
   if (anchor2 < 0)
     return [[0, anchor1], [moddeg(anchor2), 360]]
   if (anchor2 > 0)

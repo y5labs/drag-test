@@ -28,21 +28,21 @@ export default component({
   module,
   render: (h, { props, state, hub }) => {
     // shared
-    const quantincr = props.quantincr || Math.PI / 8
+    const quant_incr = props.quant_incr || Math.PI / 8
 
     // brush
     const radius = props.radius
     const isnear = (a, b) =>
-      Math.abs(modRad(b) - modRad(a)) < quantincr
+      Math.abs(modRad(b) - modRad(a)) < quant_incr
 
     let operation = props.operation
-    const selected = apply_operation({
-      anchor: props.selected_anchor,
-      range: props.selected_range
-    }, operation, quantincr)
+    const selection = apply_operation({
+      anchor: props.selection_anchor,
+      range: props.selection_range
+    }, operation, quant_incr)
     // // TODO: use this for seacreature
-    // if (selected.anchor != null) {
-    //   const selections = splitselection(selected)
+    // if (selection.anchor != null) {
+    //   const selections = splitselection(selection)
     //     .map(([start, end]) =>
     //       [quantdeg(start - epsilon), quantdeg(end + epsilon)])
     //   // console.log(selections)
@@ -53,34 +53,34 @@ export default component({
           const length = len(p)
           if (length > radius[1] || length < radius[0]) return
           const current = xy2rad(p)
-          if (selected.anchor != null) {
-            if (isnear(selected.anchor, current)) {
+          if (selection.anchor != null) {
+            if (isnear(selection.anchor, current)) {
               operation = { type: 'anchor', start: current, delta: 0 }
               return hub.emit('update', { operation: Object.assign({}, operation) })
             }
-            else if (isnear(selected.anchor + selected.range, current)) {
+            else if (isnear(selection.anchor + selection.range, current)) {
               operation = { type: 'range', start: current, delta: 0 }
               return hub.emit('update', { operation: Object.assign({}, operation) })
             }
             else {
               let rel = current
-              while (rel > selected.anchor) rel -= 2 * Math.PI
-              if (selected.range > 0) {
+              while (rel > selection.anchor) rel -= 2 * Math.PI
+              if (selection.range > 0) {
                 rel += 2 * Math.PI
-                if (rel > selected.anchor
-                  && rel < selected.anchor + selected.range) {
+                if (rel > selection.anchor
+                  && rel < selection.anchor + selection.range) {
                   operation = { type: 'move', start: current, delta: 0 }
                   return hub.emit('update', { operation: Object.assign({}, operation) })
                 }
               }
-              else if (rel < selected.anchor
-                && rel > selected.anchor + selected.range) {
+              else if (rel < selection.anchor
+                && rel > selection.anchor + selection.range) {
                 operation = { type: 'move', start: current, delta: 0 }
                 return hub.emit('update', { operation: Object.assign({}, operation) })
               }
             }
           }
-          const start = quant(quantincr).round(current)
+          const start = quant(quant_incr).round(current)
           operation = { type: 'new', start, delta: 0 }
           hub.emit('update', { operation: Object.assign({}, operation) })
         },
@@ -98,18 +98,18 @@ export default component({
           hub.emit('update', { operation: Object.assign({}, operation) })
         },
         end: p => {
-          const selected = apply_operation({
-            anchor: props.selected_anchor,
-            range: props.selected_range
-          }, operation, quantincr)
+          const selection = apply_operation({
+            anchor: props.selection_anchor,
+            range: props.selection_range
+          }, operation, quant_incr)
           hub.emit('update', {
             operation: null,
-            selected_anchor: selected.anchor,
-            selected_range: selected.range
+            selection_anchor: selection.anchor,
+            selection_range: selection.range
           })
         },
         tap: p => {
-          hub.emit('update', { selected_anchor: null, selected_range: null })
+          hub.emit('update', { selection_anchor: null, selection_range: null })
         },
         hover: p => {
           const length = len(p)

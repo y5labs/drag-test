@@ -1,4 +1,3 @@
-import { putty } from 'vue-putty'
 import component from '../component'
 import { epsilon } from '../math'
 import {
@@ -13,38 +12,35 @@ export default component({
   name: 'radial-brush',
   module,
   render: (h, { props, state, hub }) => {
-    // shared
     const quant_incr = props.quant_incr || Math.PI / 8
-
-    // display
     const radius = props.radius
     const display_quant = props.display_quant != null
       ? props.display_quant
       : false
+    const display_fn = props.display_fn || (deg => `${deg}°`)
 
-    let operation = props.operation
-    const selected = apply_operation({
-      anchor: props.selected_anchor,
-      range: props.selected_range
-    }, operation, quant_incr)
+    const selection = apply_operation({
+      anchor: props.selection_anchor,
+      range: props.selection_range
+    }, props.operation, quant_incr)
 
-    return h('g', selected.anchor != null ? (() => {
+    return h('g', selection.anchor != null ? (() => {
       const bump = display_quant
-        ? (selected.range > 0 ? -quant_incr / 2 : quant_incr / 2)
+        ? (selection.range > 0 ? -quant_incr / 2 : quant_incr / 2)
         : 0
-      const quant_selected = {
-        anchor: selected.anchor + bump,
-        range: selected.range - 2 * bump
+      const quant_selection = {
+        anchor: selection.anchor + bump,
+        range: selection.range - 2 * bump
       }
-      const from = rad2xy(quant_selected.anchor)
-      const from_deg = Number(rad2degmod(selected.anchor).toFixed(0))
-      const until = rad2xy(quant_selected.anchor + quant_selected.range)
-      const until_deg = Number(rad2degmod(selected.anchor + selected.range).toFixed(0))
-      const islarge = quant_selected.range >= Math.PI || quant_selected.range <= -Math.PI
-      const issweep = quant_selected.range > 0
+      const from = rad2xy(quant_selection.anchor)
+      const from_deg = Number(rad2degmod(selection.anchor).toFixed(0))
+      const until = rad2xy(quant_selection.anchor + quant_selection.range)
+      const until_deg = Number(rad2degmod(selection.anchor + selection.range).toFixed(0))
+      const islarge = quant_selection.range >= Math.PI || quant_selection.range <= -Math.PI
+      const issweep = quant_selection.range > 0
       const isafter =
-        (quant_selected.range > 0 && (quant_selected.range < 1.5 * Math.PI - epsilon))
-        || (quant_selected.range < 0 && (quant_selected.range < -1.5 * Math.PI + epsilon))
+        (quant_selection.range > 0 && (quant_selection.range < 1.5 * Math.PI - epsilon))
+        || (quant_selection.range < 0 && (quant_selection.range < -1.5 * Math.PI + epsilon))
       return [
         from_deg > 180
         ? h('text.label', { attrs: {
@@ -59,7 +55,7 @@ export default component({
             'text-anchor': 'end',
             transform: `rotate(${from_deg - 90})`
           }}, `${from_deg}°`),
-        Math.abs(selected.range) < quant_incr * 1
+        Math.abs(selection.range) < quant_incr * 1
         ? null
         : until_deg > 180
         ? h('text.label', { attrs: {
@@ -67,14 +63,14 @@ export default component({
             'alignment-baseline': isafter ? 'alphabetic' : 'baseline',
             'text-anchor': 'start',
             transform: `rotate(${until_deg + 90})`
-          }}, `${until_deg}°`)
+          }}, display_fn(until_deg))
         : h('text.label', { attrs: {
             dx: radius[0] - 4,
             'alignment-baseline': isafter ? 'baseline' : 'alphabetic',
             'text-anchor': 'end',
             transform: `rotate(${until_deg - 90})`
-          }}, `${until_deg}°`),
-        h('path.segment', { attrs: { d: `
+          }}, display_fn(until_deg)),
+        h('path.selection', { attrs: { d: `
           M ${xy2px(from, radius[1])}
           A ${radius[1]} ${radius[1]}
             0 ${islarge ? '1' : '0'}
