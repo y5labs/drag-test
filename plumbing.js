@@ -21,6 +21,7 @@ Vue.use({
   }
 })
 
+
 import Vuex from 'vuex'
 Vue.use(Vuex)
 import analytics from './analytics'
@@ -42,6 +43,6 @@ const scene = new Vue({
 })
 
 // Unidirectional data flow
-hub.on('update', p => { store.commit('params/update', p) })
+hub.on('update', p => store.commit('params/update', p))
 
 scene.$mount('#root')

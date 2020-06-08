@@ -13,21 +13,6 @@ body
   color white
   font-size 16px
 
-.area
-  height 12px
-  position relative
-  background-color $elevated
-  .putty
-    bottom -15px
-
-.putty
-  position absolute
-  top 0
-  left 0
-  right 0
-  bottom 0
-  z-index 1
-
 .box
   position absolute
   border 1px solid $highlight
@@ -67,29 +52,19 @@ path.segment
   fill transparent
   stroke $highlight
   stroke-width 1
-  &.red
-    fill transparent
-    stroke white
-  &.blue
-    fill blue
-    stroke blue
-  &.green
-    fill green
-    stroke green
-  &.purple
-    fill purple
-    stroke purple
+  &.normal
+    fill $elevated
+    stroke none
+  &.outside
+    fill $primary
+    stroke none
 path.line
   fill transparent
   stroke-width 1
-  &.red
-    stroke red
-  &.blue
-    stroke blue
-  &.green
-    stroke green
-  &.purple
-    stroke purple
+  &.normal
+    stroke $elevated
+  &.outside
+    stroke $primary
 
 text.label
   font-size 10px

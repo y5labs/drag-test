@@ -26,7 +26,7 @@ export default component({
 
     return h('g', selection.anchor != null ? (() => {
       const bump = display_quant
-        ? (selection.range > 0 ? -quant_incr / 2 : quant_incr / 2)
+        ? (selection.range > 0 ? -quant_incr : quant_incr) / (2.1)
         : 0
       const quant_selection = {
         anchor: selection.anchor + bump,
