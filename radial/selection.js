@@ -36,7 +36,8 @@ export default component({
       const from_deg = Number(rad2degmod(selection.anchor).toFixed(0))
       const until = rad2xy(quant_selection.anchor + quant_selection.range)
       const until_deg = Number(rad2degmod(selection.anchor + selection.range).toFixed(0))
-      const islarge = quant_selection.range >= Math.PI || quant_selection.range <= -Math.PI
+      const islarge = quant_selection.range >= Math.PI
+        || quant_selection.range <= -Math.PI
       const issweep = quant_selection.range > 0
       const isafter =
         (quant_selection.range > 0 && (quant_selection.range < 1.5 * Math.PI - epsilon))

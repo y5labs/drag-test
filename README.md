@@ -1,9 +1,7 @@
 # Drag Test
 
 # Todo
-- Remove time stuff from linear brush
-- Port linear brush to g
-- Split the brush from the visuals for radial and linear
+- Radial full selection doesn't show arc
 - Text horizontal
 - Text vertical with alignment and height
 
