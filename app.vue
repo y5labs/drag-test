@@ -15,7 +15,7 @@
           v-bind="wd_selection"
         />
         <radial-brush
-          :radius="[0, 76]"
+          :radius="[0, 75]"
           :quant_incr="Math.PI / 8"
           v-bind="wd_selection"
         />
@@ -30,6 +30,7 @@
           :domain="wsp_freq_domain"
           :width="250"
           :height="150"
+          :display_quant="true"
           :quant_incr="2"
           v-bind="wsp_selection"
         />
@@ -37,6 +38,7 @@
           :domain="wsp_freq_domain"
           :width="250"
           :height="150"
+          :display_quant="true"
           :quant_incr="2"
           v-bind="wsp_selection"
         />
@@ -55,7 +57,7 @@
           v-bind="dpm_selection"
         />
         <radial-brush
-          :radius="[0, 76]"
+          :radius="[0, 75]"
           :quant_incr="Math.PI / 8"
           v-bind="dpm_selection"
         />
@@ -70,6 +72,7 @@
           :domain="hs_freq_domain"
           :width="250"
           :height="150"
+          :display_quant="true"
           :quant_incr="0.2"
           :display_fn="x => x.toFixed(1)"
           v-bind="hs_selection"
@@ -78,6 +81,7 @@
           :domain="hs_freq_domain"
           :width="250"
           :height="150"
+          :display_quant="true"
           :quant_incr="0.2"
           v-bind="hs_selection"
         />

@@ -26,8 +26,8 @@ export default component({
       const quant_selection = !display_quant
         ? selection
         : [
-          selection[0] - quant_incr / 2,
-          selection[1] + quant_incr / 2
+          selection[0],
+          selection[1] + quant_incr
         ]
       return [
         h('rect.selection', {
