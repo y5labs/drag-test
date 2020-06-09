@@ -21,6 +21,6 @@ export default {
       await metocean.cube.batch_calculate_link_change(diff.link_change)
       await metocean.cube.batch_calculate_selection_change(diff.selection_change)
       commit('metocean_changed')
-    },
+    }
   }
 }

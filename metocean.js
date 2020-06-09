@@ -12,53 +12,48 @@ const by_hs = cube.range_single(x => x.hs)
 const by_dpm1 = cube.range_single(x => x.dpm)
 const by_dpm2 = cube.range_single(x => x.dpm)
 
-const wsp_freq_q_incr = 2
-const wsp_freq_q = quant(wsp_freq_q_incr).floor
-const wsp_freq = {}
-const wsp_freq_iter = [0]
-cube.on('selection changed', ({ put, del }) => {
-  del.forEach(x => {
-    pathie.assign(wsp_freq, [wsp_freq_q(x.wsp)], c => (c || 0) - 1)
+const group = (cube, quant_incr, fn, round = x => x) => {
+  const q = quant(quant_incr).floor
+  const groups = {}
+  const index = [{ v: 0, r: round(0) }]
+  const domain = [0, 0]
+  const range = [0, 0]
+  cube.on('selection changed', ({ put, del }) => {
+    del.forEach(x => {
+      pathie.assign(groups, [round(q(fn(x)))], c => (c || 0) - 1)
+    })
+    put.forEach(x => {
+      const v = q(fn(x))
+      while (index[index.length - 1].v < v) {
+        domain[1] = index[index.length - 1].v + quant_incr
+        index.push({v: domain[1], r: round(domain[1]) })
+      }
+      pathie.assign(groups, [round(v)], c => {
+        const res = (c || 0) + 1
+        range[1] = Math.max(res, range[1])
+        return res
+      })
+    })
   })
-  put.forEach(x => {
-    const v = wsp_freq_q(x.wsp)
-    while (wsp_freq_iter[wsp_freq_iter.length - 1] < v)
-      wsp_freq_iter.push(
-        wsp_freq_iter[wsp_freq_iter.length - 1]
-          + wsp_freq_q_incr)
-    pathie.assign(wsp_freq, [v], c => (c || 0) + 1)
-  })
-})
+  return { quant_incr, groups, index, domain, range }
+}
 
-const hs_freq_q_incr = 0.2
-const hs_freq_q = quant(hs_freq_q_incr).floor
-const hs_freq = {}
-const hs_freq_iter = [0]
-cube.on('selection changed', ({ put, del }) => {
-  del.forEach(x => {
-    pathie.assign(hs_freq, [hs_freq_q(x.hs)], c => (c || 0) - 1)
-  })
-  put.forEach(x => {
-    const v = hs_freq_q(x.hs)
-    while (hs_freq_iter[hs_freq_iter.length - 1] < v)
-      hs_freq_iter.push(
-        hs_freq_iter[hs_freq_iter.length - 1]
-          + hs_freq_q_incr)
-    pathie.assign(hs_freq, [v.toFixed(1)], c => (c || 0) + 1)
-  })
-})
+const wd = group(cube, Math.PI / 8, x => x.wd, x => x.toFixed(3))
+const wsp = group(cube, 2, x => x.wsp, x => x.toFixed(0))
+const dpm = group(cube, Math.PI / 8, x => x.dpm, x => x.toFixed(3))
+const hs = group(cube, 0.2, x => x.hs, x => x.toFixed(1))
 
 export {
   cube,
   by_time,
   by_wsp,
-  wsp_freq_iter,
-  wsp_freq,
+  wd,
+  wsp,
   by_wd1,
   by_wd2,
   by_hs,
-  hs_freq_iter,
-  hs_freq,
+  dpm,
+  hs,
   by_dpm1,
   by_dpm2
 }

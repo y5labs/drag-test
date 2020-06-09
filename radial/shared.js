@@ -27,8 +27,8 @@ const apply_operation = (selection, operation, quant_incr) => {
     selection.range -= 2 * Math.PI
   while (selection.range - epsilon <= - 2 * Math.PI)
     selection.range += 2 * Math.PI
-  if (Math.abs(selection.range) < epsilon)
-    selection.range = quant_incr
+  // if (Math.abs(selection.range) < epsilon)
+  //   selection.range = quant_incr
   // if (Math.abs(Math.abs(selection.range) - 2 * Math.PI) - epsilon < quant_incr)
   //   return { anchor: null, range: null }
   return selection

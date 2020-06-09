@@ -67,6 +67,7 @@ export default component({
           })
         },
         tap: p => {
+          const current = scale.inv(p[0])
           document.body.style.cursor = 'crosshair'
           hub.emit('update', {
             selection: null

@@ -42,9 +42,12 @@ export default {
       return linearFromExtents(
         [0, this.values.length - 1], [0, this.width])
     },
+    max() {
+      return this.range ? this.range[1] : Math.max.apply(null, this.values)
+    },
     y() {
       return linearFromExtents(
-        [0, quant(10).ceil(Math.max.apply(null, this.values))], [this.height, 0])
+        [0, quant(10).ceil(this.max)], [this.height, 0])
     },
     points() {
       return sliceLine(this.scaleBreak, this.values)

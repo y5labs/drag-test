@@ -1,3 +1,5 @@
+const deg2rad = x => x / 180 * Math.PI
+
 export default async () =>
   (await (await fetch('/metocean.txt')).text())
     .split('>')[0]
@@ -8,7 +10,7 @@ export default async () =>
       const g = () => items.shift()
 
       return {
-        time: new Date(`${g().replace(' ', 'T')}+13:00`),
+        time: new Date(`${g().replace(' ', 'T')}+13:00`).getTime() / 1000,
         lev: Number(g()),
         hs: Number(g()),
         hx: Number(g()),
@@ -16,7 +18,7 @@ export default async () =>
         tm01: Number(g()),
         tm02: Number(g()),
         dp: Number(g()),
-        dpm: Number(g()),
+        dpm: Number(deg2rad(g())),
         hs_sw1: Number(g()),
         hs_sw8: Number(g()),
         tp_sw1: Number(g()),
@@ -34,7 +36,7 @@ export default async () =>
         hs_fig: Number(g()),
         wsp: Number(g()),
         gst: Number(g()),
-        wd: Number(g()),
+        wd: Number(deg2rad(g())),
         wsp100: Number(g()),
         wsp50: Number(g()),
         wsp80: Number(g()),

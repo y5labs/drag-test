@@ -4,9 +4,8 @@
       <g transform="translate(75 75)">
         <radial-histogram
           :radius="[35, 60]"
-          :values="[
-            3, 1, 2, 3, 1, 7, 3, 2, null, 1, 6, 3, null, 9, 3, 2
-          ]"
+          :range="wd_range"
+          :values="wd"
         />
         <radial-selection
           :radius="[35, 60]"
@@ -24,6 +23,7 @@
         <linear-histogram
           :width="250"
           :height="150"
+          :range="wsp_freq_range"
           :values="wsp_freq"
         />
         <linear-selection
@@ -46,9 +46,8 @@
       <g transform="translate(75 225)">
         <radial-histogram
           :radius="[35, 60]"
-          :values="[
-            3, 1, 2, 3, 1, 7, 3, 2, null, 1, 6, 3, null, 9, 3, 2
-          ]"
+          :range="dpm_range"
+          :values="dpm"
         />
         <radial-selection
           :radius="[35, 60]"
@@ -66,6 +65,7 @@
         <linear-histogram
           :width="250"
           :height="150"
+          :range="hs_freq_range"
           :values="hs_freq"
         />
         <linear-selection
@@ -90,6 +90,7 @@
         <chop-lines
           :width="400"
           :height="100"
+          :range="hs_by_time_range"
           :scaleBreak="[
             [1.5, { level: 0, class: 'normal'}],
             [Infinity, { level: 1, class: 'outside'}]
@@ -101,6 +102,7 @@
           <chop-lines
             :width="400"
             :height="100"
+            :range="wsp_by_time_range"
             :scaleBreak="[
               [15, { level: 0, class: 'normal'}],
               [Infinity, { level: 1, class: 'outside'}]
@@ -109,6 +111,21 @@
             :values="wsp_by_time"
           />
         </g>
+        <linear-selection
+          :domain="time_domain"
+          :width="400"
+          :height="200"
+          :quant_incr="3600"
+          :display_fn="x => new Date(x * 1000).toISOString().substring(0, 13)"
+          v-bind="time_selection"
+        />
+        <linear-brush
+          :domain="time_domain"
+          :width="400"
+          :height="200"
+          :quant_incr="3600"
+          v-bind="time_selection"
+        />
       </g>
     </svg>
   </div>
@@ -122,6 +139,7 @@ import linearBrush from './linear/brush'
 import linearSelection from './linear/selection'
 import linearHistogram from './linear/histogram'
 import chopLines from './chop-lines'
+import { apply_operation as apply_linear } from './linear/shared'
 
 export default {
   components: {
@@ -143,9 +161,9 @@ export default {
     }
   },
   methods: {
-    // async filter() {
-    //   await this.$store.dispatch('analytics/products_count_greaterthan', 5)
-    // },
+    async filter() {
+      // await this.$store.dispatch('analytics/products_count_greaterthan', 5)
+    },
     // async unfilter() {
     //   await this.$store.dispatch('analytics/products_count_clear')
     // }
@@ -154,29 +172,64 @@ export default {
     metocean() {
       return this.$store.state.analytics.metocean
     },
+    by_time() {
+      return Array.from(this.metocean.by_time.all(Infinity))
+    },
+    hs_by_time_range() {
+      return [0, Math.max.apply(null, this.by_time.map(x => x[1].d.hs))]
+    },
     hs_by_time() {
-      return Array.from(this.metocean.by_time.filtered(Infinity), x => x[1].hs)
+      return this.by_time.map(x => x[1].isfiltered ? x[1].d.hs : null)
+    },
+    time_domain() {
+      return [
+        Array.from(this.metocean.by_time.unfiltered(1),
+          x => x[1].time)[0],
+        Array.from(this.metocean.by_time.unfiltered(-1),
+          x => x[1].time)[0]
+      ]
+    },
+    hs_freq_range() {
+      return this.metocean.hs.range
     },
     hs_freq_domain() {
       return [
-        this.metocean.hs_freq_iter[0],
-        this.metocean.hs_freq_iter[this.metocean.hs_freq_iter.length - 1] + 0.2
+        this.metocean.hs.domain[0],
+        this.metocean.hs.domain[1]
+          + this.metocean.hs.quant_incr
       ]
     },
     hs_freq() {
-      return this.metocean.hs_freq_iter.map(f => this.metocean.hs_freq[f.toFixed(1)] || 0)
+      return this.metocean.hs.index.map(f =>
+        this.metocean.hs.groups[f.r] || 0)
+    },
+    wsp_by_time_range() {
+      return [0, Math.max.apply(null, this.by_time.map(x => x[1].d.wsp))]
     },
     wsp_by_time() {
-      return Array.from(this.metocean.by_time.filtered(Infinity), x => x[1].wsp)
+      return this.by_time.map(x => x[1].isfiltered ? x[1].d.wsp : null)
+    },
+    wsp_freq_range() {
+      return this.metocean.wsp.range
     },
     wsp_freq_domain() {
       return [
-        this.metocean.wsp_freq_iter[0],
-        this.metocean.wsp_freq_iter[this.metocean.wsp_freq_iter.length - 1] + 2
+        this.metocean.wsp.domain[0],
+        this.metocean.wsp.domain[1]
+          + this.metocean.wsp.quant_incr
       ]
     },
     wsp_freq() {
-      return this.metocean.wsp_freq_iter.map(f => this.metocean.wsp_freq[f] || 0)
+      return this.metocean.wsp.index.map(f =>
+        this.metocean.wsp.groups[f.r] || 0)
+    },
+    wd() {
+      return Array(2 * Math.PI / this.metocean.wd.quant_incr)
+        .fill(0).map((d, i) => (i * this.metocean.wd.quant_incr)
+          .toFixed(3)).map(x => this.metocean.wd.groups[x] || 0)
+    },
+    wd_range() {
+      return this.metocean.wd.range
     },
     wd_selection() {
       return {
@@ -194,6 +247,14 @@ export default {
         })
       }
     },
+    dpm() {
+      return Array(2 * Math.PI / this.metocean.dpm.quant_incr)
+        .fill(0).map((d, i) => (i * this.metocean.dpm.quant_incr)
+          .toFixed(3)).map(x => this.metocean.dpm.groups[x] || 0)
+    },
+    dpm_range() {
+      return this.metocean.dpm.range
+    },
     dpm_selection() {
       return {
         ...this.$store.state.params.dpm_selection,
@@ -206,7 +267,47 @@ export default {
       return {
         ...this.$store.state.params.hs_selection,
         hub: this.$hub.child({
-          update: hs_selection => this.$hub.emit('update', { hs_selection })
+          update: async hs_selection => {
+            const values = Object.assign(
+              {},
+              this.$store.state.params.hs_selection,
+              hs_selection)
+            const selection = apply_linear(
+              values.selection,
+              values.operation,
+              3600,
+              this.hs_freq_domain)
+            if (selection)
+              await this.metocean.by_hs(selection[0], selection[1])
+            else
+              await this.metocean.by_hs(null)
+            this.$store.commit('analytics/metocean_changed')
+            this.$hub.emit('update', { hs_selection })
+          }
+        })
+      }
+    },
+    time_selection() {
+      return {
+        ...this.$store.state.params.time_selection,
+        hub: this.$hub.child({
+          update: async time_selection => {
+            const values = Object.assign(
+              {},
+              this.$store.state.params.time_selection,
+              time_selection)
+            const selection = apply_linear(
+              values.selection,
+              values.operation,
+              3600,
+              this.time_domain)
+            if (selection)
+              await this.metocean.by_time(selection[0], selection[1])
+            else
+              await this.metocean.by_time(null)
+            this.$store.commit('analytics/metocean_changed')
+            await this.$hub.emit('update', { time_selection })
+          }
         })
       }
     }
