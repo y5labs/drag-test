@@ -16,8 +16,7 @@ export default {
   },
   actions: {
     async metocean_load({ commit }) {
-      const data = await metoceanData()
-      const diff = await metocean.cube.batch({ put: data })
+      const diff = await metocean.cube.batch({ put: metoceanData })
       await metocean.cube.batch_calculate_link_change(diff.link_change)
       await metocean.cube.batch_calculate_selection_change(diff.selection_change)
       commit('metocean_changed')
