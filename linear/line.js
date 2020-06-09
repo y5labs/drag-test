@@ -1,12 +1,12 @@
-import component from './component'
+import component from '../component'
 import {
   linearFromExtents,
-  sliceArea,
+  sliceLine,
   quant
-} from './math'
+} from '../math'
 
 export default component({
-  name: 'app',
+  name: 'linear-area',
   module,
   render: (h, { props, hub }) => {
     const width = props.width
@@ -19,9 +19,9 @@ export default component({
     const x = linearFromExtents([0, values.length], [gap, width + gap])
     const y = linearFromExtents([0, quant(quant_incr).ceil(max)], [height, 0])
     const xy2px = (x1, y1) => `${x(x1).toFixed(1)} ${y(y1).toFixed(1)}`
-    const points = sliceArea(scaleBreak, 0, values)
+    const points = sliceLine(scaleBreak, values)
     return h('g', [
-      ...points.map(c => h('path.segment', {
+      ...points.map(c => h('path.line', {
         class: {
           [scaleBreak[c.level][1].class]: true
         },

@@ -45,6 +45,7 @@ const sliceArea = (scaleBreak, bottom, data) => {
   let i = 0
   let stack = null
   while (data[i] == null && i < data.length) i++
+  if (i == data.length) return result
   const initialise = i => {
     stack = [...Array(breaks(scaleBreak, data[i]).level).keys()]
       .map(j => {
@@ -122,6 +123,7 @@ const sliceLine = (scaleBreak, data) => {
   let current = null
   let points = null
   while (data[i] == null && i < data.length) i++
+  if (i == data.length) return result
   const initialise = i => {
     current = breaks(scaleBreak, data[i]).level
     points = [[i, data[i]]]

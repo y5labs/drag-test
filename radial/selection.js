@@ -9,7 +9,7 @@ import {
 } from './shared'
 
 export default component({
-  name: 'radial-brush',
+  name: 'radial-selection',
   module,
   render: (h, { props, state, hub }) => {
     const quant_incr = props.quant_incr || Math.PI / 8

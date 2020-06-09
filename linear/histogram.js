@@ -5,7 +5,7 @@ import {
 } from '../math'
 
 export default component({
-  name: 'app',
+  name: 'linear-histogram',
   module,
   render: (h, { props, hub }) => {
     const width = props.width

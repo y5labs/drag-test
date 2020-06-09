@@ -6,11 +6,7 @@ import pathie from 'seacreature/lib/pathie'
 const cube = Cube(x => x.time)
 const by_time = cube.range_single(x => x.time)
 const by_wsp = cube.range_single(x => x.wsp)
-const by_wd1 = cube.range_single(x => x.wd)
-const by_wd2 = cube.range_single(x => x.wd)
 const by_hs = cube.range_single(x => x.hs)
-const by_dpm1 = cube.range_single(x => x.dpm)
-const by_dpm2 = cube.range_single(x => x.dpm)
 
 const group = (cube, quant_incr, fn, round = x => x) => {
   const q = quant(quant_incr).floor
@@ -39,21 +35,29 @@ const group = (cube, quant_incr, fn, round = x => x) => {
 }
 
 const wd = group(cube, Math.PI / 8, x => x.wd, x => x.toFixed(3))
+const wd_freq1 = cube.range_single(x => quant(Math.PI / 8).floor(x.wd) / Math.PI * 180)
+const wd_freq2 = cube.range_single(x => quant(Math.PI / 8).floor(x.wd) / Math.PI * 180)
 const wsp = group(cube, 2, x => x.wsp, x => x.toFixed(0))
+const wsp_freq = cube.range_single(x => quant(2).floor(x.wsp))
 const dpm = group(cube, Math.PI / 8, x => x.dpm, x => x.toFixed(3))
+const dpm_freq1 = cube.range_single(x => quant(Math.PI / 8).floor(x.dpm) / Math.PI * 180)
+const dpm_freq2 = cube.range_single(x => quant(Math.PI / 8).floor(x.dpm) / Math.PI * 180)
 const hs = group(cube, 0.2, x => x.hs, x => x.toFixed(1))
+const hs_freq = cube.range_single(x => quant(0.2).floor(x.hs))
 
 export {
   cube,
   by_time,
   by_wsp,
-  wd,
   wsp,
-  by_wd1,
-  by_wd2,
+  wsp_freq,
+  wd,
+  wd_freq1,
+  wd_freq2,
   by_hs,
-  dpm,
   hs,
-  by_dpm1,
-  by_dpm2
+  hs_freq,
+  dpm,
+  dpm_freq1,
+  dpm_freq2
 }

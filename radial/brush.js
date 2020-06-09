@@ -40,13 +40,6 @@ export default component({
       anchor: props.selection_anchor,
       range: props.selection_range
     }, operation, quant_incr)
-    // // TODO: use this for seacreature
-    // if (selection.anchor != null) {
-    //   const selections = splitselection(selection)
-    //     .map(([start, end]) =>
-    //       [quantdeg(start - epsilon), quantdeg(end + epsilon)])
-    //   // console.log(selections)
-    // }
     return h('rect', {
       on: putty({ offset: [radius[1], radius[1]] }, {
         start: p => {
