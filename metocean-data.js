@@ -1,7 +1,7 @@
 const deg2rad = x => x / 180 * Math.PI
 
 export default async () =>
-  (await (await fetch('/metocean.txt')).text())
+  (await (await fetch('./metocean.txt')).text())
     .split('>')[0]
     .split('\n')
     .slice(1, -1)
