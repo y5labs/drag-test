@@ -90,35 +90,35 @@
         <linear-line
           :width="400"
           :height="100"
-          :range="hs_by_time_range"
-          :scaleBreak="hs_by_time_breaks"
-          :quant_incr="2"
-          :values="hs_by_time_inv"
+          :range="wsp_by_time_range"
+          :scaleBreak="wsp_by_time_breaks"
+          :quant_incr="5"
+          :values="wsp_by_time_inv"
         />
         <linear-area
           :width="400"
           :height="100"
-          :range="hs_by_time_range"
-          :scaleBreak="hs_by_time_breaks"
-          :quant_incr="2"
-          :values="hs_by_time"
+          :range="wsp_by_time_range"
+          :scaleBreak="wsp_by_time_breaks"
+          :quant_incr="5"
+          :values="wsp_by_time"
         />
         <g transform="translate(0 100)">
           <linear-line
             :width="400"
             :height="100"
-            :range="wsp_by_time_range"
-            :scaleBreak="wsp_by_time_breaks"
-            :quant_incr="5"
-            :values="wsp_by_time_inv"
+            :range="hs_by_time_range"
+            :scaleBreak="hs_by_time_breaks"
+            :quant_incr="2"
+            :values="hs_by_time_inv"
           />
           <linear-area
             :width="400"
             :height="100"
-            :range="wsp_by_time_range"
-            :scaleBreak="wsp_by_time_breaks"
-            :quant_incr="5"
-            :values="wsp_by_time"
+            :range="hs_by_time_range"
+            :scaleBreak="hs_by_time_breaks"
+            :quant_incr="2"
+            :values="hs_by_time"
           />
         </g>
         <linear-selection
@@ -278,7 +278,7 @@ export default {
               this.hs_freq_quant_incr,
               this.hs_freq_domain)
             if (selection)
-              await this.metocean.hs_freq(selection[0], selection[1])
+              await this.metocean.hs_freq(selection[0] - epsilon, selection[1] + epsilon)
             else
               await this.metocean.hs_freq(null)
             this.$store.commit('analytics/metocean_changed')
@@ -347,7 +347,7 @@ export default {
               this.wsp_freq_quant_incr,
               this.wsp_freq_domain)
             if (selection)
-              await this.metocean.wsp_freq(selection[0], selection[1])
+              await this.metocean.wsp_freq(selection[0] - epsilon, selection[1] + epsilon)
             else
               await this.metocean.wsp_freq(null)
             this.$store.commit('analytics/metocean_changed')
@@ -386,13 +386,12 @@ export default {
               const selections = splitselection(selection)
                 .map(([start, end]) =>
                   [quantdeg(start - epsilon), quantdeg(end + epsilon)])
-              console.log({ selections })
               if (selections.length == 2) {
-                await this.metocean.wd_freq1(selections[0][0], selections[0][1])
-                await this.metocean.wd_freq2(selections[1][0], selections[1][1])
+                await this.metocean.wd_freq1(selections[0][0] - epsilon, selections[0][1] + epsilon)
+                await this.metocean.wd_freq2(selections[1][0] - epsilon, selections[1][1] + epsilon)
               }
               else {
-                await this.metocean.wd_freq1(selections[0][0], selections[0][1])
+                await this.metocean.wd_freq1(selections[0][0] - epsilon, selections[0][1])
                 await this.metocean.wd_freq2(-1)
               }
             }
@@ -437,11 +436,11 @@ export default {
                 .map(([start, end]) =>
                   [quantdeg(start - epsilon), quantdeg(end + epsilon)])
               if (selections.length == 2) {
-                await this.metocean.dpm_freq1(selections[0][0], selections[0][1])
-                await this.metocean.dpm_freq2(selections[1][0], selections[1][1])
+                await this.metocean.dpm_freq1(selections[0][0] - epsilon, selections[0][1] + epsilon)
+                await this.metocean.dpm_freq2(selections[1][0] - epsilon, selections[1][1] + epsilon)
               }
               else {
-                await this.metocean.dpm_freq1(selections[0][0], selections[0][1])
+                await this.metocean.dpm_freq1(selections[0][0] - epsilon, selections[0][1] + epsilon)
                 await this.metocean.dpm_freq2(-1)
               }
             }

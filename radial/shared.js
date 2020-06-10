@@ -55,7 +55,6 @@ const quantdeg = quant(1).round
 const splitselection = selection => {
   const anchor1 = moddeg(rad2deg(selection.anchor))
   const anchor2 = anchor1 + rad2deg(selection.range)
-  console.log({ selection, anchor1, anchor2 })
   if (anchor2 < anchor1 && anchor2 < 0)
     return [[0, anchor1], [moddeg(anchor2), 360]]
   if (anchor2 > anchor1 && anchor2 >= 360)

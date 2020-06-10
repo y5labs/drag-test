@@ -20,8 +20,6 @@ const apply_operation = (selection, operation, quant_incr, domain) => {
       [selection[1], selection[0]]
   selection[0] = quant(quant_incr).round(selection[0])
   selection[1] = quant(quant_incr).round(selection[1])
-  if (selection[0] == selection[1])
-    selection[1] += quant_incr
   if (selection[0] < domain[0])
     selection[0] = domain[0]
   if (selection[1] > domain[1])
