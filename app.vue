@@ -1,6 +1,6 @@
 <template>
   <div v-if="is_loaded">
-    <svg width="400px" height="550px" style="overflow: visible;">
+    <svg width="400px" height="570px" style="overflow: visible;">
       <g transform="translate(75 75)">
         <radial-histogram
           :radius="[35, 60]"
