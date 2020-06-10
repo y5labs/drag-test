@@ -1,8 +1,8 @@
 # Drag Test
 
 # Todo
-- Should be okay to select a single bar in histogram
-- Convert wd_freq and dpm_freq into set dimensions. Port split into set
+- Should be possible to select a single bar in histogram
+- Create new style of range\_single that selects what _not_ to show
 - Text horizontal
 - Text vertical with alignment and height
 
