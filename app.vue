@@ -371,7 +371,38 @@ export default {
       return {
         ...this.$store.state.params.wd_selection,
         hub: this.$hub.child({
-          update: wd_selection => this.$hub.emit('update', { wd_selection })
+          update: async wd_selection => {
+            const values = Object.assign(
+              {},
+              this.$store.state.params.wd_selection,
+              wd_selection)
+            const selection = apply_radial({
+                anchor: values.selection_anchor,
+                range: values.selection_range
+              },
+              values.operation,
+              this.wd_freq_quant_incr)
+            if (selection && selection.anchor != null) {
+              const selections = splitselection(selection)
+                .map(([start, end]) =>
+                  [quantdeg(start - epsilon), quantdeg(end + epsilon)])
+              console.log({ selections })
+              if (selections.length == 2) {
+                await this.metocean.wd_freq1(selections[0][0], selections[0][1])
+                await this.metocean.wd_freq2(selections[1][0], selections[1][1])
+              }
+              else {
+                await this.metocean.wd_freq1(selections[0][0], selections[0][1])
+                await this.metocean.wd_freq2(-1)
+              }
+            }
+            else {
+              await this.metocean.wd_freq1(null)
+              await this.metocean.wd_freq2(null)
+            }
+            this.$store.commit('analytics/metocean_changed')
+            await this.$hub.emit('update', { wd_selection })
+          }
         })
       }
     },
@@ -405,19 +436,18 @@ export default {
               const selections = splitselection(selection)
                 .map(([start, end]) =>
                   [quantdeg(start - epsilon), quantdeg(end + epsilon)])
-              // console.log(selections)
               if (selections.length == 2) {
                 await this.metocean.dpm_freq1(selections[0][0], selections[0][1])
-                // await this.metocean.dpm_freq2(selections[1][0], selections[1][1])
+                await this.metocean.dpm_freq2(selections[1][0], selections[1][1])
               }
               else {
                 await this.metocean.dpm_freq1(selections[0][0], selections[0][1])
-                // await this.metocean.dpm_freq2(null)
+                await this.metocean.dpm_freq2(-1)
               }
             }
             else {
               await this.metocean.dpm_freq1(null)
-              // await this.metocean.dpm_freq2(null)
+              await this.metocean.dpm_freq2(null)
             }
             this.$store.commit('analytics/metocean_changed')
             await this.$hub.emit('update', { dpm_selection })

@@ -35,13 +35,15 @@ const group = (cube, quant_incr, fn, round = x => x) => {
 }
 
 const wd = group(cube, Math.PI / 8, x => x.wd, x => x.toFixed(3))
-const wd_freq1 = cube.range_single(x => quant(Math.PI / 8).floor(x.wd) / Math.PI * 180)
-const wd_freq2 = cube.range_single(x => quant(Math.PI / 8).floor(x.wd) / Math.PI * 180)
+const wd_freq = cube.or()
+const wd_freq1 = wd_freq.range_single(x => quant(Math.PI / 8).floor(x.wd) / Math.PI * 180)
+const wd_freq2 = wd_freq.range_single(x => quant(Math.PI / 8).floor(x.wd) / Math.PI * 180)
 const wsp = group(cube, 2, x => x.wsp, x => x.toFixed(0))
 const wsp_freq = cube.range_single(x => quant(2).floor(x.wsp))
 const dpm = group(cube, Math.PI / 8, x => x.dpm, x => x.toFixed(3))
-const dpm_freq1 = cube.range_single(x => quant(Math.PI / 8).floor(x.dpm) / Math.PI * 180)
-const dpm_freq2 = cube.range_single(x => quant(Math.PI / 8).floor(x.dpm) / Math.PI * 180)
+const dpm_freq = cube.or()
+const dpm_freq1 = dpm_freq.range_single(x => quant(Math.PI / 8).floor(x.dpm) / Math.PI * 180)
+const dpm_freq2 = dpm_freq.range_single(x => quant(Math.PI / 8).floor(x.dpm) / Math.PI * 180)
 const hs = group(cube, 0.2, x => x.hs, x => x.toFixed(1))
 const hs_freq = cube.range_single(x => quant(0.2).floor(x.hs))
 
