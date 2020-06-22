@@ -8,3 +8,7 @@
 # Later
 - Vertical linear brush
 - Direction arrows
+
+
+Add big.js
+https://github.com/MikeMcl/big.js/

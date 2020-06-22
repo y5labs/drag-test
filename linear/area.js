@@ -8,12 +8,12 @@ import {
 export default component({
   name: 'linear-area',
   module,
-  render: (h, { props, hub }) => {
+  render: (h, { props }) => {
     const width = props.width
     const height = props.height
     const scaleBreak = props.scaleBreak
     const values = props.values
-    const quant_incr = props.quant_incr
+    const quant_incr = props.quant_incr || 10
     const gap = width / values.length / 2
     const max = props.range ? props.range[1] : Math.max.apply(null, values)
     const x = linearFromExtents([0, values.length], [gap, width + gap])

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Hub from 'seacreature/lib/hub'
-import app from './app.vue'
+import app from './app2.vue'
 
 Vue.config.devtools = false
 Vue.config.productionTip = false
