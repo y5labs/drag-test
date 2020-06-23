@@ -11,7 +11,7 @@ export default component({
     const width = props.width
     const height = props.height
     const values = props.values
-    const quant_incr = props.quant_incr
+    const quant_incr = props.quant_incr || 10
     const bar_width_total = width / values.length
     const bar_width = (bar_width_total * 0.9).toFixed(0)
     const bar_gap = bar_width_total - bar_width
