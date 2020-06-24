@@ -99,6 +99,15 @@
           :range="wsp_by_time_range"
           :values="wsp_by_time_inv"
         />
+        <g class="axis_major">
+          <linear-grid-y
+            :width="360"
+            :height="100"
+            :quant_incr="50"
+            :range="wsp_by_time_range"
+            :values="wsp_by_time_inv"
+          />
+        </g>
         <linear-line
           :width="360"
           :height="100"
@@ -232,6 +241,15 @@
           :range="hs_by_time_range"
           :values="hs_by_time_inv"
         />
+        <g class="axis_major">
+          <linear-grid-y
+            :width="360"
+            :height="100"
+            :quant_incr="10"
+            :range="hs_by_time_range"
+            :values="hs_by_time_inv"
+          />
+        </g>
         <linear-line
           :width="360"
           :height="100"

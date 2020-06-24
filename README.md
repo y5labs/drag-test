@@ -15,5 +15,5 @@
 - Direction arrows
 
 
-Add big.js
+Refactor for big.js
 https://github.com/MikeMcl/big.js/
