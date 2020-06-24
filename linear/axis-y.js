@@ -6,7 +6,7 @@ import {
 } from '../math'
 
 export default component({
-  name: 'linear-y-axis',
+  name: 'linear-axis-y',
   module,
   render: (h, { props, hub }) => {
     const height = props.height

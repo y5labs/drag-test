@@ -16,8 +16,9 @@ const quant = incr => ({
   ceil: x => Math.ceil(x / incr) * incr,
   floor: x => Math.floor(x / incr) * incr
 })
-const range = (a, b, step = 1) =>
-  Array((b - a) / step + 1).fill(0).map((d, i) => a + step * i)
+const range = (a, b, step = 1) => {
+  return Array(quant(step).floor(b - a) / step + 1).fill(0).map((d, i) => a + step * i)
+}
 const lerp = (v0, v1, t) => v0 * (1 - t) + v1 * t
 const _nearestExp = (fn, value, exp) => {
   if (typeof exp === 'undefined' || +exp == 0)
