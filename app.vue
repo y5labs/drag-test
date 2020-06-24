@@ -21,9 +21,16 @@
       </g>
       <g transform="translate(150 0)">
         <g v-if="wsp_axis_visible" transform="translate(0 160)">
-          <linear-axis
+          <linear-histogram-x-axis
             :width="250"
             :values="wsp_freq_axis"
+          />
+        </g>
+        <g transform="translate(-5 0)">
+          <linear-y-axis
+            :height="150"
+            :range="wsp_freq_range"
+            :values="wsp_freq"
           />
         </g>
         <linear-histogram
@@ -69,10 +76,17 @@
       </g>
       <g transform="translate(150 175)">
         <g v-if="hs_axis_visible" class="tiny_text" transform="translate(0 153)">
-          <linear-axis
+          <linear-histogram-x-axis
             :width="250"
             :display_fn="x => x.toFixed(1)"
             :values="hs_freq_axis"
+          />
+        </g>
+        <g transform="translate(-5 0)">
+          <linear-y-axis
+            :height="150"
+            :range="hs_freq_range"
+            :values="hs_freq"
           />
         </g>
         <linear-histogram
@@ -161,7 +175,8 @@ import radialHistogram from './radial/histogram'
 import linearBrush from './linear/brush'
 import linearSelection from './linear/selection'
 import linearHistogram from './linear/histogram'
-import linearAxis from './linear/axis'
+import linearHistogramXAxis from './linear/histogram-x-axis'
+import linearYAxis from './linear/y-axis'
 import linearArea from './linear/area'
 import linearLine from './linear/line'
 import { apply_operation as apply_linear } from './linear/shared'
@@ -176,7 +191,8 @@ export default {
     linearBrush,
     linearSelection,
     linearHistogram,
-    linearAxis,
+    linearHistogramXAxis,
+    linearYAxis,
     linearArea,
     linearLine
   },

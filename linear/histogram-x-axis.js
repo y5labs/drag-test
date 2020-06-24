@@ -5,7 +5,7 @@ import {
 } from '../math'
 
 export default component({
-  name: 'linear-axis',
+  name: 'linear-histogram-x-axis',
   module,
   render: (h, { props, hub }) => {
     const width = props.width
@@ -19,11 +19,10 @@ export default component({
       bar_gap + bar_width / 2,
       width + bar_gap + bar_width / 2
     ])
-    const x2px = x1 => `${x(x1).toFixed(1)} 0`
     return h('g', values.map((d, i) =>
       d == null ? null
       : h('g', { attrs: { transform: `translate(${x(i).toFixed(1)} 0)` } }, [
-        h('text.axis', display_fn(d))
+        h('text.axis.x', display_fn(d))
       ])
     ))
   }
