@@ -20,6 +20,12 @@
         />
       </g>
       <g transform="translate(150 0)">
+        <g v-if="wsp_axis_visible" transform="translate(0 160)">
+          <linear-axis
+            :width="250"
+            :values="wsp_freq_axis"
+          />
+        </g>
         <linear-histogram
           :width="250"
           :height="150"
@@ -62,6 +68,13 @@
         />
       </g>
       <g transform="translate(150 175)">
+        <g v-if="hs_axis_visible" class="tiny_text" transform="translate(0 153)">
+          <linear-axis
+            :width="250"
+            :display_fn="x => x.toFixed(1)"
+            :values="hs_freq_axis"
+          />
+        </g>
         <linear-histogram
           :width="250"
           :height="150"
@@ -148,6 +161,7 @@ import radialHistogram from './radial/histogram'
 import linearBrush from './linear/brush'
 import linearSelection from './linear/selection'
 import linearHistogram from './linear/histogram'
+import linearAxis from './linear/axis'
 import linearArea from './linear/area'
 import linearLine from './linear/line'
 import { apply_operation as apply_linear } from './linear/shared'
@@ -162,6 +176,7 @@ export default {
     linearBrush,
     linearSelection,
     linearHistogram,
+    linearAxis,
     linearArea,
     linearLine
   },
@@ -259,9 +274,17 @@ export default {
           + this.metocean.hs.quant_incr
       ]
     },
+    hs_freq_axis() {
+      return this.metocean.hs.index.map(f => f.v)
+    },
     hs_freq() {
       return this.metocean.hs.index.map(f =>
         this.metocean.hs.groups[f.r] || 0)
+    },
+    hs_axis_visible() {
+      return this.$store.state.params.hs_selection == null
+        || (this.$store.state.params.hs_selection.selection == null
+          && this.$store.state.params.hs_selection.operation == null)
     },
     hs_selection() {
       return {
@@ -331,6 +354,14 @@ export default {
     wsp_freq() {
       return this.metocean.wsp.index.map(f =>
         this.metocean.wsp.groups[f.r] || 0)
+    },
+    wsp_freq_axis() {
+      return this.metocean.wsp.index.map(f => f.v)
+    },
+    wsp_axis_visible() {
+      return this.$store.state.params.wsp_selection == null
+        || (this.$store.state.params.wsp_selection.selection == null
+          && this.$store.state.params.wsp_selection.operation == null)
     },
     wsp_selection() {
       return {

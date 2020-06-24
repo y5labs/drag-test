@@ -66,10 +66,23 @@ path.line
   &.outside
     stroke $elevated
 
-text.label
+text.label,
+text.axis
   font-size 10px
   font-family monospace
+
+text.label
   fill $highlight
+
+text.axis
+  fill $primary
+  text-anchor middle
+  alignment-baseline middle
+
+.tiny_text text.axis
+  font-size 8px
+  text-anchor start
+  transform rotate(90deg)
 
 path.histogram,
 rect.histogram
