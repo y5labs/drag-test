@@ -13,6 +13,10 @@ body
   color white
   font-size 16px
 
+.wrapper
+  margin 0 auto
+  width 400px
+
 .box
   position absolute
   border 1px solid $highlight
@@ -22,6 +26,13 @@ body
   pointer-events none
   &.selected
     background-color transparent
+
+h1
+  color $primary
+  text-align center
+  font-family monospace
+  font-size 18px
+  margin-top 2rem
 
 .start,
 .end,
@@ -94,6 +105,10 @@ line.grid.y
 .axis_major line.grid.y
   stroke-width 1
   stroke-dasharray none
+.grid_inv line.grid
+  stroke $background
+  stroke-width 0.5
+  stroke-dasharray 5
 
 path.histogram,
 rect.histogram

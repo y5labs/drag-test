@@ -1,5 +1,6 @@
 <template>
-  <div v-if="is_loaded">
+  <div class="wrapper" v-if="is_loaded">
+    <h1>Wind speed <small> direction, duration & timeseries</small></h1>
     <svg width="400px" height="340px" style="overflow: visible;">
       <g transform="translate(75 95)">
         <radial-histogram
@@ -124,6 +125,14 @@
           :quant_incr="5"
           :values="wsp_by_time"
         />
+        <g class="grid_inv">
+          <linear-grid-x
+            :width="360"
+            :height="100"
+            :values="time_axis"
+            :ticks="time_axis_ticks"
+          />
+        </g>
         <linear-selection
           :domain="time_domain"
           :width="360"
@@ -141,6 +150,7 @@
         />
       </g>
     </svg>
+    <h1>Wave height <small>direction, duration & timeseries</small></h1>
     <svg width="400px" height="340px" style="overflow: visible;">
       <g transform="translate(75 95)">
         <radial-histogram
@@ -266,6 +276,14 @@
           :quant_incr="2"
           :values="hs_by_time"
         />
+        <g class="grid_inv">
+          <linear-grid-x
+            :width="360"
+            :height="100"
+            :values="time_axis"
+            :ticks="time_axis_ticks"
+          />
+        </g>
         <linear-selection
           :domain="time_domain"
           :width="360"
