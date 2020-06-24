@@ -6,9 +6,10 @@ import {
 } from '../math'
 
 export default component({
-  name: 'linear-axis-y',
+  name: 'linear-grid-y',
   module,
   render: (h, { props, hub }) => {
+    const width = props.width
     const height = props.height
     const values = props.values
     const quant_incr = props.quant_incr || 10
@@ -20,7 +21,7 @@ export default component({
     const ticks = props.ticks || range(r[0], r[1], quant_incr)
     return h('g', ticks.map(d =>
       h('g', { attrs: { transform: `translate(0 ${y(d).toFixed(1)})` } }, [
-        h('text.axis.y', display_fn(d))
+        h('line.grid.y', { attrs: { x1: 0, y1: 0, x2: width, y2: 0 } })
       ])
     ))
   }

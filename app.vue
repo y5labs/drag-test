@@ -1,7 +1,7 @@
 <template>
   <div v-if="is_loaded">
-    <svg width="400px" height="570px" style="overflow: visible;">
-      <g transform="translate(75 75)">
+    <svg width="400px" height="340px" style="overflow: visible;">
+      <g transform="translate(75 95)">
         <radial-histogram
           :radius="[35, 60]"
           :range="wd_range"
@@ -19,45 +19,121 @@
           v-bind="wd_selection"
         />
       </g>
-      <g transform="translate(150 0)">
-        <g v-if="wsp_axis_visible" transform="translate(0 160)">
+      <g transform="translate(200 0)">
+        <linear-grid-y
+          :width="200"
+          :height="150"
+          :quant_incr="10"
+          :range="wsp_freq_range"
+          :values="wsp_freq"
+        />
+        <g class="axis_major">
+          <linear-grid-y
+            :width="200"
+            :height="150"
+            :quant_incr="50"
+            :range="wsp_freq_range"
+            :values="wsp_freq"
+          />
+        </g>
+        <g v-if="wsp_axis_visible" transform="translate(0 155)">
           <linear-histogram-axis-x
-            :width="250"
+            :width="200"
             :quant_incr="2"
+            :display_fn="x => `${x.toFixed(0)}kts`"
             :values="wsp_freq_axis"
           />
         </g>
         <g transform="translate(-5 0)">
           <linear-axis-y
             :height="150"
+            :display_fn="x => `${x.toFixed(0)}hrs`"
             :range="wsp_freq_range"
             :values="wsp_freq"
           />
         </g>
         <linear-histogram
-          :width="250"
+          :width="200"
           :height="150"
           :range="wsp_freq_range"
           :values="wsp_freq"
         />
         <linear-selection
           :domain="wsp_freq_domain"
-          :width="250"
+          :width="200"
           :height="150"
           :display_quant="true"
+          :display_fn="x => `${x.toFixed(0)}kts`"
           :quant_incr="wsp_freq_quant_incr"
           v-bind="wsp_selection"
         />
         <linear-brush
           :domain="wsp_freq_domain"
-          :width="250"
+          :width="200"
           :height="150"
           :display_quant="true"
           :quant_incr="wsp_freq_quant_incr"
           v-bind="wsp_selection"
         />
       </g>
-      <g transform="translate(75 250)">
+      <g transform="translate(40 200)">
+        <g transform="translate(-5 0)">
+          <linear-axis-y
+            :height="100"
+            :display_fn="x => `${x.toFixed(0)}kts`"
+            :range="wsp_by_time_range"
+            :values="wsp_by_time_inv"
+          />
+        </g>
+        <g v-if="time_axis_visible" transform="translate(0 105)">
+          <linear-axis-x
+            :width="360"
+            :values="time_axis"
+            :ticks="time_axis_ticks"
+            :display_fn="x => simpleday(x)"
+          />
+        </g>
+        <linear-grid-y
+          :width="360"
+          :height="100"
+          :range="wsp_by_time_range"
+          :values="wsp_by_time_inv"
+        />
+        <linear-line
+          :width="360"
+          :height="100"
+          :range="wsp_by_time_range"
+          :scaleBreak="wsp_by_time_breaks"
+          :quant_incr="5"
+          :values="wsp_by_time_inv"
+        />
+        <linear-area
+          :width="360"
+          :height="100"
+          :range="wsp_by_time_range"
+          :scaleBreak="wsp_by_time_breaks"
+          :quant_incr="5"
+          :values="wsp_by_time"
+        />
+        <linear-selection
+          :domain="time_domain"
+          :width="360"
+          :height="100"
+          :quant_incr="time_quant_incr"
+          :display_fn="x => new Date(x * 1000).toISOString().substring(0, 13)"
+          v-bind="time_selection"
+        />
+        <linear-brush
+          :domain="time_domain"
+          :width="360"
+          :height="100"
+          :quant_incr="time_quant_incr"
+          v-bind="time_selection"
+        />
+      </g>
+    </svg>
+    <svg width="400px" height="340px" style="overflow: visible;">
+      <g transform="translate(75 95)">
         <radial-histogram
           :radius="[35, 60]"
           :range="dpm_range"
@@ -75,93 +151,115 @@
           v-bind="dpm_selection"
         />
       </g>
-      <g transform="translate(150 175)">
-        <g v-if="hs_axis_visible" class="tiny_text" transform="translate(0 153)">
+      <g transform="translate(200 0)">
+        <linear-grid-y
+          :width="200"
+          :height="150"
+          :range="hs_freq_range"
+          :values="hs_freq"
+        />
+        <g class="axis_major">
+          <linear-grid-y
+            :width="200"
+            :height="150"
+            :quant_incr="50"
+            :range="hs_freq_range"
+            :values="hs_freq"
+          />
+        </g>
+        <g v-if="hs_axis_visible" transform="translate(0 155)">
           <linear-histogram-axis-x
-            :width="250"
+            :width="200"
             :quant_incr="2"
-            :display_fn="x => x.toFixed(1)"
+            :display_fn="x => `${x.toFixed(1)}m`"
             :values="hs_freq_axis"
           />
         </g>
         <g transform="translate(-5 0)">
           <linear-axis-y
             :height="150"
+            :display_fn="x => `${x.toFixed(0)}hrs`"
             :range="hs_freq_range"
             :values="hs_freq"
           />
         </g>
         <linear-histogram
-          :width="250"
+          :width="200"
           :height="150"
           :range="hs_freq_range"
           :values="hs_freq"
         />
         <linear-selection
           :domain="hs_freq_domain"
-          :width="250"
+          :width="200"
           :height="150"
           :display_quant="true"
           :quant_incr="hs_freq_quant_incr"
-          :display_fn="x => x.toFixed(1)"
+          :display_fn="x => `${x.toFixed(1)}m`"
           v-bind="hs_selection"
         />
         <linear-brush
           :domain="hs_freq_domain"
-          :width="250"
+          :width="200"
           :height="150"
           :display_quant="true"
           :quant_incr="hs_freq_quant_incr"
           v-bind="hs_selection"
         />
       </g>
-      <g transform="translate(0 350)">
-        <linear-line
-          :width="400"
-          :height="100"
-          :range="wsp_by_time_range"
-          :scaleBreak="wsp_by_time_breaks"
-          :quant_incr="5"
-          :values="wsp_by_time_inv"
-        />
-        <linear-area
-          :width="400"
-          :height="100"
-          :range="wsp_by_time_range"
-          :scaleBreak="wsp_by_time_breaks"
-          :quant_incr="5"
-          :values="wsp_by_time"
-        />
-        <g transform="translate(0 100)">
-          <linear-line
-            :width="400"
+      <g transform="translate(40 200)">
+        <g transform="translate(-5 0)">
+          <linear-axis-y
             :height="100"
+            :quant_incr="1"
+            :display_fn="x => `${x.toFixed(0)}m`"
             :range="hs_by_time_range"
-            :scaleBreak="hs_by_time_breaks"
-            :quant_incr="2"
             :values="hs_by_time_inv"
           />
-          <linear-area
-            :width="400"
-            :height="100"
-            :range="hs_by_time_range"
-            :scaleBreak="hs_by_time_breaks"
-            :quant_incr="2"
-            :values="hs_by_time"
+        </g>
+        <g v-if="time_axis_visible" transform="translate(0 105)">
+          <linear-axis-x
+            :width="360"
+            :values="time_axis"
+            :ticks="time_axis_ticks"
+            :display_fn="x => simpleday(x)"
           />
         </g>
+        <linear-grid-y
+          :width="360"
+          :height="100"
+          :quant_incr="1"
+          :range="hs_by_time_range"
+          :values="hs_by_time_inv"
+        />
+        <linear-line
+          :width="360"
+          :height="100"
+          :range="hs_by_time_range"
+          :scaleBreak="hs_by_time_breaks"
+          :quant_incr="2"
+          :values="hs_by_time_inv"
+        />
+        <linear-area
+          :width="360"
+          :height="100"
+          :range="hs_by_time_range"
+          :scaleBreak="hs_by_time_breaks"
+          :quant_incr="2"
+          :values="hs_by_time"
+        />
         <linear-selection
           :domain="time_domain"
-          :width="400"
-          :height="200"
+          :width="360"
+          :height="100"
           :quant_incr="time_quant_incr"
           :display_fn="x => new Date(x * 1000).toISOString().substring(0, 13)"
           v-bind="time_selection"
         />
         <linear-brush
           :domain="time_domain"
-          :width="400"
-          :height="200"
+          :width="360"
+          :height="100"
           :quant_incr="time_quant_incr"
           v-bind="time_selection"
         />
@@ -180,11 +278,18 @@ import linearHistogram from './linear/histogram'
 import linearHistogramAxisX from './linear/histogram-axis-x'
 import linearAxisX from './linear/axis-x'
 import linearAxisY from './linear/axis-y'
+import linearGridX from './linear/grid-x'
+import linearGridY from './linear/grid-y'
 import linearArea from './linear/area'
 import linearLine from './linear/line'
 import { apply_operation as apply_linear } from './linear/shared'
-import { apply_operation as apply_radial, splitselection, quantdeg } from './radial/shared'
+import {
+  apply_operation as apply_radial,
+  splitselection,
+  quantdeg
+} from './radial/shared'
 import { epsilon } from './math'
+import { startOfDay, isEqual, format } from 'date-fns'
 
 export default {
   components: {
@@ -197,6 +302,8 @@ export default {
     linearHistogramAxisX,
     linearAxisX,
     linearAxisY,
+    linearGridX,
+    linearGridY,
     linearArea,
     linearLine
   },
@@ -210,6 +317,9 @@ export default {
     }
   },
   methods: {
+    simpleday(d) {
+      return format(d, "d'/'M")
+    }
   },
   computed: {
     metocean() {
@@ -256,6 +366,20 @@ export default {
     },
     time_quant_incr() {
       return 3600
+    },
+    time_axis_visible() {
+      return this.$store.state.params.time_selection == null
+        || (this.$store.state.params.time_selection.selection == null
+          && this.$store.state.params.time_selection.operation == null)
+    },
+    time_axis() {
+      return this.by_time.map(x => new Date(x[0] * 1000))
+    },
+    time_axis_ticks() {
+      return this.time_axis
+        .map((d, i) => ({ d, i }))
+        .filter(({ d }) => isEqual(d,startOfDay(d)))
+        .map(({ i }) => i)
     },
     time_selection() {
       return {
