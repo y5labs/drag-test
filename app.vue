@@ -9,6 +9,16 @@
           :range="wd_range"
           :values="wd"
         />
+        <radial-grid-x
+          :radius="[35, 60]"
+        />
+        <g class="radial">
+          <radial-axis-x
+            :radius="[35, 60]"
+            :values="['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']"
+            :display_fn="x => x"
+          />
+        </g>
         <g class="radial" transform="rotate(-45)">
           <g class="background">
             <radial-axis-y
@@ -194,6 +204,16 @@
           :range="dpm_range"
           :values="dpm"
         />
+        <radial-grid-x
+          :radius="[35, 60]"
+        />
+        <g class="radial">
+          <radial-axis-x
+            :radius="[35, 60]"
+            :values="['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']"
+            :display_fn="x => x"
+          />
+        </g>
         <g class="axis_major">
           <radial-grid-y
             :radius="[35, 60]"
@@ -377,7 +397,9 @@
 import radialBrush from './radial/brush'
 import radialSelection from './radial/selection'
 import radialHistogram from './radial/histogram'
+import radialAxisX from './radial/axis-x'
 import radialAxisY from './radial/axis-y'
+import radialGridX from './radial/grid-x'
 import radialGridY from './radial/grid-y'
 import linearBrush from './linear/brush'
 import linearSelection from './linear/selection'
@@ -403,7 +425,9 @@ export default {
     radialBrush,
     radialSelection,
     radialHistogram,
+    radialAxisX,
     radialAxisY,
+    radialGridX,
     radialGridY,
     linearBrush,
     linearSelection,

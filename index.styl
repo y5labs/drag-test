@@ -95,6 +95,11 @@ text.axis.x
 text.axis.y
   text-anchor end
 
+.radial text.axis.x
+  transform none
+  text-anchor middle
+  alignment-baseline alphabetic
+  transform translate(0, -5px)
 .radial text.axis.y
   font-size 8px
   text-anchor middle
@@ -119,6 +124,8 @@ circle.grid.y
   stroke $background
   stroke-width 0.5
   stroke-dasharray 5
+path.grid.x
+  fill $primary
 
 path.histogram,
 rect.histogram

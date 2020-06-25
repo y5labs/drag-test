@@ -74,5 +74,6 @@ export {
   modRadHalf,
   rad2xy,
   rad2degmod,
-  xy2px
+  xy2px,
+  rad2deg
 }
