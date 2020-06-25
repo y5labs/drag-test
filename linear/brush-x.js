@@ -4,7 +4,7 @@ import { linearFromExtents, quant } from '../math'
 import { apply_operation } from './shared'
 
 export default component({
-  name: 'linear-brush',
+  name: 'linear-brush-x',
   module,
   render: (h, { props, hub }) => {
     const quant_incr = props.quant_incr

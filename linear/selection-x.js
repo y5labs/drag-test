@@ -3,7 +3,7 @@ import { linearFromExtents } from '../math'
 import { apply_operation } from './shared'
 
 export default component({
-  name: 'linear-selection',
+  name: 'linear-selection-x',
   module,
   render: (h, { props, hub }) => {
     const quant_incr = props.quant_incr

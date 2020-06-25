@@ -103,7 +103,7 @@
           :range="wsp_freq_range"
           :values="wsp_freq"
         />
-        <linear-selection
+        <linear-selection-x
           :domain="wsp_freq_domain"
           :width="200"
           :height="150"
@@ -112,7 +112,7 @@
           :quant_incr="wsp_freq_quant_incr"
           v-bind="wsp_selection"
         />
-        <linear-brush
+        <linear-brush-x
           :domain="wsp_freq_domain"
           :width="200"
           :height="150"
@@ -177,7 +177,7 @@
             :ticks="time_axis_ticks"
           />
         </g>
-        <linear-selection
+        <linear-selection-x
           :domain="time_domain"
           :width="360"
           :height="100"
@@ -185,7 +185,7 @@
           :display_fn="x => new Date(x * 1000).toISOString().substring(0, 13)"
           v-bind="time_selection"
         />
-        <linear-brush
+        <linear-brush-x
           :domain="time_domain"
           :width="360"
           :height="100"
@@ -297,7 +297,7 @@
           :range="hs_freq_range"
           :values="hs_freq"
         />
-        <linear-selection
+        <linear-selection-x
           :domain="hs_freq_domain"
           :width="200"
           :height="150"
@@ -306,7 +306,7 @@
           :display_fn="x => `${x.toFixed(1)}m`"
           v-bind="hs_selection"
         />
-        <linear-brush
+        <linear-brush-x
           :domain="hs_freq_domain"
           :width="200"
           :height="150"
@@ -373,7 +373,7 @@
             :ticks="time_axis_ticks"
           />
         </g>
-        <linear-selection
+        <linear-selection-x
           :domain="time_domain"
           :width="360"
           :height="100"
@@ -381,7 +381,7 @@
           :display_fn="x => new Date(x * 1000).toISOString().substring(0, 13)"
           v-bind="time_selection"
         />
-        <linear-brush
+        <linear-brush-x
           :domain="time_domain"
           :width="360"
           :height="100"
@@ -401,8 +401,8 @@ import radialAxisX from './radial/axis-x'
 import radialAxisY from './radial/axis-y'
 import radialGridX from './radial/grid-x'
 import radialGridY from './radial/grid-y'
-import linearBrush from './linear/brush'
-import linearSelection from './linear/selection'
+import linearBrushX from './linear/brush-x'
+import linearSelectionX from './linear/selection-x'
 import linearHistogram from './linear/histogram'
 import linearHistogramAxisX from './linear/histogram-axis-x'
 import linearAxisX from './linear/axis-x'
@@ -429,8 +429,8 @@ export default {
     radialAxisY,
     radialGridX,
     radialGridY,
-    linearBrush,
-    linearSelection,
+    linearBrushX,
+    linearSelectionX,
     linearHistogram,
     linearHistogramAxisX,
     linearAxisX,
