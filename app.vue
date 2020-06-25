@@ -551,6 +551,31 @@
             v-bind="hs_selection"
           />
         </g>
+        <linear-selection-x-y
+          :width="360"
+          :height="360"
+          :domain_x="hs_freq_domain"
+          :range_x="hs_freq_domain"
+          :range_quant_incr_x="1"
+          :display_quant_x="true"
+          :quant_incr_x="hs_freq_quant_incr"
+          :domain_y="wsp_freq_domain"
+          :range_y="wsp_freq_domain"
+          :range_quant_incr_y="5"
+          :display_quant_y="true"
+          :quant_incr_y="wsp_freq_quant_incr"
+          v-bind="hs_wsp_selection"
+        />
+        <!-- <linear-brush-xy
+          :domain="hs_freq_domain"
+          :range="hs_freq_domain"
+          :range_quant_incr="1"
+          :width="360"
+          :height="40"
+          :display_quant="true"
+          :quant_incr="hs_freq_quant_incr"
+          v-bind="hs_selection"
+        /> -->
       </g>
     </svg>
   </div>
@@ -568,6 +593,7 @@ import linearBrushX from './linear/brush-x'
 import linearBrushY from './linear/brush-y'
 import linearSelectionX from './linear/selection-x'
 import linearSelectionY from './linear/selection-y'
+import linearSelectionXY from './linear/selection-xy'
 import linearHistogram from './linear/histogram'
 import linearHistogramAxisX from './linear/histogram-axis-x'
 import linearAxisX from './linear/axis-x'
@@ -599,6 +625,7 @@ export default {
     linearBrushY,
     linearSelectionX,
     linearSelectionY,
+    linearSelectionXY,
     linearHistogram,
     linearHistogramAxisX,
     linearAxisX,
@@ -731,6 +758,43 @@ export default {
       return this.$store.state.params.hs_selection == null
         || (this.$store.state.params.hs_selection.selection == null
           && this.$store.state.params.hs_selection.operation == null)
+    },
+    hs_wsp_selection() {
+      return {
+        ...(() => {
+          if (!this.$store.state.params.hs_selection) return {}
+          return {
+            selection_x: this.$store.state.params.hs_selection.selection,
+            operation_x: this.$store.state.params.hs_selection.operation
+          }
+        })(),
+        ...(() => {
+          if (!this.$store.state.params.wsp_selection) return {}
+          return {
+            selection_y: this.$store.state.params.wsp_selection.selection,
+            operation_y: this.$store.state.params.wsp_selection.operation
+          }
+        })(),
+        hub: this.$hub.child({
+          update: async hs_selection => {
+            const values = Object.assign(
+              {},
+              this.$store.state.params.hs_selection,
+              hs_selection)
+            const selection = apply_linear(
+              values.selection,
+              values.operation,
+              this.hs_freq_quant_incr,
+              this.hs_freq_domain)
+            if (selection)
+              await this.metocean.hs_freq(selection[0] - epsilon, selection[1] + epsilon)
+            else
+              await this.metocean.hs_freq(null)
+            this.$store.commit('analytics/metocean_changed')
+            await this.$hub.emit('update', { hs_selection })
+          }
+        })
+      }
     },
     hs_selection() {
       return {

@@ -15,7 +15,7 @@ export default component({
     const display_quant = props.display_quant != null
       ? props.display_quant
       : false
-    const isnear = (a, b) => Math.abs(b - a) < props.quant_incr
+    const isnear = (a, b) => Math.abs(b - a) < quant_incr
 
     const domain = props.domain || [0, 100]
     let operation = props.operation
