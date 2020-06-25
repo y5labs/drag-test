@@ -120,6 +120,7 @@
           :range_quant_incr="1"
           :width="200"
           :height="190"
+          :display_quant="true"
           :quant_incr="wsp_freq_quant_incr"
           v-bind="wsp_selection"
         />
@@ -341,6 +342,7 @@
           :range_quant_incr="0.2"
           :width="200"
           :height="180"
+          :display_quant="true"
           :quant_incr="hs_freq_quant_incr"
           v-bind="hs_selection"
         />
@@ -521,6 +523,7 @@
             :range_quant_incr="5"
             :width="40"
             :height="360"
+            :display_quant="true"
             :quant_incr="wsp_freq_quant_incr"
             v-bind="wsp_selection"
           />
@@ -543,6 +546,7 @@
             :range_quant_incr="1"
             :width="360"
             :height="40"
+            :display_quant="true"
             :quant_incr="hs_freq_quant_incr"
             v-bind="hs_selection"
           />

@@ -27,7 +27,7 @@ export default component({
     const max = props.range ? props.range[1] : Math.max.apply(null, values)
     const r = [
       quant(range_quant_incr).floor(min),
-      quant(range_quant_incr).ceil(max) - quant_incr
+      quant(range_quant_incr).ceil(max) - (!display_quant ? 0 : quant_incr)
     ]
     const scale = linearFromExtents(r, [0, width])
 
