@@ -20,6 +20,7 @@ export default component({
       operation,
       quant_incr,
       domain)
+
     const min = props.range ? props.range[0] : Math.min.apply(null, values)
     const max = props.range ? props.range[1] : Math.max.apply(null, values)
     const r = [

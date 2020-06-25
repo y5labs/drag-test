@@ -105,6 +105,8 @@
         />
         <linear-selection-x
           :domain="wsp_freq_domain"
+          :range="wsp_freq_domain"
+          :range_quant_incr="0"
           :width="200"
           :height="150"
           :display_quant="true"
@@ -114,9 +116,10 @@
         />
         <linear-brush-x
           :domain="wsp_freq_domain"
+          :range="wsp_freq_domain"
+          :range_quant_incr="1"
           :width="200"
           :height="190"
-          :display_quant="true"
           :quant_incr="wsp_freq_quant_incr"
           v-bind="wsp_selection"
         />
@@ -200,6 +203,7 @@
         </g>
         <linear-selection-x
           :domain="time_domain"
+          :range="time_domain"
           :width="360"
           :height="100"
           :quant_incr="time_quant_incr"
@@ -208,6 +212,8 @@
         />
         <linear-brush-x
           :domain="time_domain"
+          :range="time_domain"
+          :range_quant_incr="1"
           :width="360"
           :height="140"
           :quant_incr="time_quant_incr"
@@ -320,6 +326,8 @@
         />
         <linear-selection-x
           :domain="hs_freq_domain"
+          :range="hs_freq_domain"
+          :range_quant_incr="0.2"
           :width="200"
           :height="150"
           :display_quant="true"
@@ -329,9 +337,10 @@
         />
         <linear-brush-x
           :domain="hs_freq_domain"
+          :range="hs_freq_domain"
+          :range_quant_incr="0.2"
           :width="200"
           :height="180"
-          :display_quant="true"
           :quant_incr="hs_freq_quant_incr"
           v-bind="hs_selection"
         />
@@ -349,7 +358,7 @@
         <g transform="translate(-40 0)">
           <linear-selection-y
             :domain="hs_freq_domain"
-            :range="hs_by_time_range"
+            :range="hs_freq_domain"
             :range_quant_incr="2"
             :width="40"
             :height="100"
@@ -359,7 +368,7 @@
           />
           <linear-brush-y
             :domain="hs_freq_domain"
-            :range="hs_by_time_range"
+            :range="hs_freq_domain"
             :range_quant_incr="2"
             :width="40"
             :height="100"
@@ -418,23 +427,27 @@
         </g>
         <linear-selection-x
           :domain="time_domain"
+          :range="time_domain"
           :width="360"
           :height="100"
+          :range_quant_incr="1"
           :quant_incr="time_quant_incr"
           :display_fn="x => new Date(x * 1000).toISOString().substring(0, 13)"
           v-bind="time_selection"
         />
         <linear-brush-x
           :domain="time_domain"
+          :range="time_domain"
           :width="360"
           :height="140"
+          :range_quant_incr="1"
           :quant_incr="time_quant_incr"
           v-bind="time_selection"
         />
       </g>
     </svg>
     <h1>Wave height vs Wind speed</h1>
-    <svg width="400px" height="400px" style="overflow: visible;">
+    <svg width="400px" height="420px" style="overflow: visible;">
       <g transform="translate(40, 0)">
         <linear-grid-y
           :width="360"
@@ -450,7 +463,7 @@
             :range="wsp_freq_domain"
           />
         </g>
-        <g transform="translate(-5, 0)">
+        <g v-if="wsp_axis_visible" transform="translate(-5, 0)">
           <linear-axis-y
             :height="360"
             :quant_incr="5"
@@ -480,6 +493,60 @@
             :display_fn="x => `${x}m`"
           />
         </g>
+        <linear-scatter
+          :width="360"
+          :height="360"
+          :range_x="hs_freq_domain"
+          :quant_incr_x="1"
+          :values_x="hs_by_time"
+          :range_y="wsp_freq_domain"
+          :quant_incr_y="5"
+          :values_y="wsp_by_time"
+        />
+        <g transform="translate(-40 0)">
+          <linear-selection-y
+            :domain="wsp_freq_domain"
+            :range="wsp_freq_domain"
+            :range_quant_incr="5"
+            :width="40"
+            :height="360"
+            :display_quant="true"
+            :display_fn="x => `${x.toFixed(0)}kts`"
+            :quant_incr="wsp_freq_quant_incr"
+            v-bind="wsp_selection"
+          />
+          <linear-brush-y
+            :domain="wsp_freq_domain"
+            :range="wsp_freq_domain"
+            :range_quant_incr="5"
+            :width="40"
+            :height="360"
+            :quant_incr="wsp_freq_quant_incr"
+            v-bind="wsp_selection"
+          />
+        </g>
+        <g transform="translate(0 360)">
+          <linear-selection-x
+            :domain="hs_freq_domain"
+            :range="hs_freq_domain"
+            :range_quant_incr="1"
+            :width="360"
+            :height="40"
+            :display_quant="true"
+            :display_fn="x => `${x.toFixed(1)}m`"
+            :quant_incr="hs_freq_quant_incr"
+            v-bind="hs_selection"
+          />
+          <linear-brush-x
+            :domain="hs_freq_domain"
+            :range="hs_freq_domain"
+            :range_quant_incr="1"
+            :width="360"
+            :height="40"
+            :quant_incr="hs_freq_quant_incr"
+            v-bind="hs_selection"
+          />
+        </g>
       </g>
     </svg>
   </div>
@@ -505,6 +572,7 @@ import linearGridX from './linear/grid-x'
 import linearGridY from './linear/grid-y'
 import linearArea from './linear/area'
 import linearLine from './linear/line'
+import linearScatter from './linear/scatter'
 import { apply_operation as apply_linear } from './linear/shared'
 import {
   apply_operation as apply_radial,
@@ -534,7 +602,8 @@ export default {
     linearGridX,
     linearGridY,
     linearArea,
-    linearLine
+    linearLine,
+    linearScatter
   },
   async mounted() {
     await this.$store.dispatch('analytics/metocean_load')

@@ -8,18 +8,27 @@ export default component({
   module,
   render: (h, { props, hub }) => {
     const quant_incr = props.quant_incr
+    const range_quant_incr = props.range_quant_incr || 10
     const width = props.width
     const height = props.height
+    const values = props.values
     const isnear = (a, b) => Math.abs(b - a) < props.quant_incr
 
     const domain = props.domain || [0, 100]
-    const scale = linearFromExtents(domain, [0, width])
     let operation = props.operation
     const selection = apply_operation(
       props.selection,
       operation,
       quant_incr,
       domain)
+
+    const min = props.range ? props.range[0] : Math.min.apply(null, values)
+    const max = props.range ? props.range[1] : Math.max.apply(null, values)
+    const r = [
+      quant(range_quant_incr).floor(min),
+      quant(range_quant_incr).ceil(max) - quant_incr
+    ]
+    const scale = linearFromExtents(r, [0, width])
 
     return h('rect', {
       on: putty({ offset: [0, 0] }, {
