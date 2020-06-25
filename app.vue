@@ -3,6 +3,40 @@
     <h1>Wind speed <small> direction, duration & timeseries</small></h1>
     <svg width="400px" height="340px" style="overflow: visible;">
       <g transform="translate(75 95)">
+        <radial-grid-y
+          :radius="[35, 60]"
+          :quant_incr="20"
+          :range="wd_range"
+          :values="wd"
+        />
+        <g class="radial" transform="rotate(-45)">
+          <g class="background">
+            <radial-axis-y
+              :radius="[35, 60]"
+              :quant_incr="20"
+              :display_fn="x => `${x.toFixed(0)}hrs`"
+              :range="wd_range"
+              :ticks="[20, 40]"
+              :values="wd"
+            />
+          </g>
+          <radial-axis-y
+            :radius="[35, 60]"
+            :quant_incr="20"
+            :display_fn="x => `${x.toFixed(0)}hrs`"
+            :range="wd_range"
+            :ticks="[20, 40]"
+            :values="wd"
+          />
+        </g>
+        <g class="axis_major">
+          <radial-grid-y
+            :radius="[35, 60]"
+            :quant_incr="100"
+            :range="wd_range"
+            :values="wd"
+          />
+        </g>
         <radial-histogram
           :radius="[35, 60]"
           :range="wd_range"
@@ -153,6 +187,41 @@
     <h1>Wave height <small>direction, duration & timeseries</small></h1>
     <svg width="400px" height="340px" style="overflow: visible;">
       <g transform="translate(75 95)">
+        <radial-grid-y
+          :radius="[35, 60]"
+          :quant_incr="100"
+          :ticks="[100, 200]"
+          :range="dpm_range"
+          :values="dpm"
+        />
+        <g class="axis_major">
+          <radial-grid-y
+            :radius="[35, 60]"
+            :quant_incr="1000"
+            :range="dpm_range"
+            :values="dpm"
+          />
+        </g>
+        <g class="radial" transform="rotate(-45)">
+          <g class="background">
+            <radial-axis-y
+              :radius="[35, 60]"
+              :quant_incr="100"
+              :display_fn="x => `${x.toFixed(0)}hrs`"
+              :range="dpm_range"
+              :ticks="[100, 200]"
+              :values="dpm"
+            />
+          </g>
+          <radial-axis-y
+            :radius="[35, 60]"
+            :quant_incr="100"
+            :display_fn="x => `${x.toFixed(0)}hrs`"
+            :range="dpm_range"
+            :ticks="[100, 200]"
+            :values="dpm"
+          />
+        </g>
         <radial-histogram
           :radius="[35, 60]"
           :range="dpm_range"
@@ -308,6 +377,8 @@
 import radialBrush from './radial/brush'
 import radialSelection from './radial/selection'
 import radialHistogram from './radial/histogram'
+import radialAxisY from './radial/axis-y'
+import radialGridY from './radial/grid-y'
 import linearBrush from './linear/brush'
 import linearSelection from './linear/selection'
 import linearHistogram from './linear/histogram'
@@ -332,6 +403,8 @@ export default {
     radialBrush,
     radialSelection,
     radialHistogram,
+    radialAxisY,
+    radialGridY,
     linearBrush,
     linearSelection,
     linearHistogram,

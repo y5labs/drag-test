@@ -19,7 +19,7 @@ export default component({
     const bar_width = bar_width_total * bar_portion
     const bar_offset = bar_width / 2
     const max = props.range ? props.range[1] : Math.max.apply(null, values)
-    const y = linearFromExtents([0, quant(10).ceil(max)], [radius[0], radius[1]])
+    const y = linearFromExtents([0, quant(10).ceil(max)], radius)
     return h('g', [
       ...values.map((d, i) => {
         if (d == null) return null

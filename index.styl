@@ -95,14 +95,24 @@ text.axis.x
 text.axis.y
   text-anchor end
 
+.radial text.axis.y
+  font-size 8px
+  text-anchor middle
+.radial .background text.axis.y
+  stroke $background
+  stroke-width 4
+
 line.grid.x,
-line.grid.y
+line.grid.y,
+circle.grid.y
   fill none
   stroke $primary
-line.grid.y
+line.grid.y,
+circle.grid.y
   stroke-width 0.5
   stroke-dasharray 5
-.axis_major line.grid.y
+.axis_major line.grid.y,
+.axis_major circle.grid.y
   stroke-width 1
   stroke-dasharray none
 .grid_inv line.grid
