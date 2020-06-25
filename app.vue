@@ -370,6 +370,7 @@
         <g v-if="time_axis_visible" transform="translate(0 105)">
           <linear-axis-x
             :width="360"
+            :quant_incr="1"
             :values="time_axis"
             :ticks="time_axis_ticks"
             :display_fn="x => simpleday(x)"
@@ -430,6 +431,55 @@
           :quant_incr="time_quant_incr"
           v-bind="time_selection"
         />
+      </g>
+    </svg>
+    <h1>Wave height vs Wind speed</h1>
+    <svg width="400px" height="400px" style="overflow: visible;">
+      <g transform="translate(40, 0)">
+        <linear-grid-y
+          :width="360"
+          :height="360"
+          :quant_incr="5"
+          :range="wsp_freq_domain"
+        />
+        <g class="axis_major">
+          <linear-grid-y
+            :width="360"
+            :height="360"
+            :quant_incr="50"
+            :range="wsp_freq_domain"
+          />
+        </g>
+        <g transform="translate(-5, 0)">
+          <linear-axis-y
+            :height="360"
+            :quant_incr="5"
+            :range="wsp_freq_domain"
+            :display_fn="x => `${x}kts`"
+          />
+        </g>
+        <linear-grid-x
+          :width="360"
+          :height="360"
+          :quant_incr="1"
+          :range="hs_freq_domain"
+        />
+        <g class="axis_major">
+          <linear-grid-x
+            :width="360"
+            :height="360"
+            :quant_incr="50"
+            :range="hs_freq_domain"
+          />
+        </g>
+        <g transform="translate(0, 365)">
+          <linear-axis-x
+            :width="360"
+            :quant_incr="1"
+            :range="hs_freq_domain"
+            :display_fn="x => `${x}m`"
+          />
+        </g>
       </g>
     </svg>
   </div>
@@ -558,7 +608,7 @@ export default {
       return this.time_axis
         .map((d, i) => ({ d, i }))
         .filter(({ d }) => isEqual(d,startOfDay(d)))
-        .map(({ i }) => i)
+        .map(({ d }) => d)
     },
     time_selection() {
       return {
