@@ -5,11 +5,8 @@
 - Text horizontal
 - Text vertical with alignment and height
 - Drag timeline rect out of bounds - errors on console
-- Brush y
-- Selection y
-
-# Later
-- Vertical linear brush
+- Brush XY
+- Selection XY
 - Direction arrows
 
 

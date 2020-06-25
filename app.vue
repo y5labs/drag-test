@@ -115,19 +115,40 @@
         <linear-brush-x
           :domain="wsp_freq_domain"
           :width="200"
-          :height="150"
+          :height="190"
           :display_quant="true"
           :quant_incr="wsp_freq_quant_incr"
           v-bind="wsp_selection"
         />
       </g>
       <g transform="translate(40 200)">
-        <g transform="translate(-5 0)">
+        <g v-if="wsp_axis_visible" transform="translate(-5 0)">
           <linear-axis-y
             :height="100"
             :display_fn="x => `${x.toFixed(0)}kts`"
             :range="wsp_by_time_range"
             :values="wsp_by_time_inv"
+          />
+        </g>
+        <g transform="translate(-40 0)">
+          <linear-selection-y
+            :domain="wsp_freq_domain"
+            :range="wsp_by_time_range"
+            :range_quant_incr="5"
+            :width="40"
+            :height="100"
+            :display_fn="x => `${x.toFixed(0)}kts`"
+            :quant_incr="wsp_freq_quant_incr"
+            v-bind="wsp_selection"
+          />
+          <linear-brush-y
+            :domain="wsp_freq_domain"
+            :range="wsp_by_time_range"
+            :range_quant_incr="5"
+            :width="40"
+            :height="100"
+            :quant_incr="wsp_freq_quant_incr"
+            v-bind="wsp_selection"
           />
         </g>
         <g v-if="time_axis_visible" transform="translate(0 105)">
@@ -188,7 +209,7 @@
         <linear-brush-x
           :domain="time_domain"
           :width="360"
-          :height="100"
+          :height="140"
           :quant_incr="time_quant_incr"
           v-bind="time_selection"
         />
@@ -309,20 +330,41 @@
         <linear-brush-x
           :domain="hs_freq_domain"
           :width="200"
-          :height="150"
+          :height="180"
           :display_quant="true"
           :quant_incr="hs_freq_quant_incr"
           v-bind="hs_selection"
         />
       </g>
       <g transform="translate(40 200)">
-        <g transform="translate(-5 0)">
+        <g v-if="hs_axis_visible" transform="translate(-5 0)">
           <linear-axis-y
             :height="100"
             :quant_incr="1"
             :display_fn="x => `${x.toFixed(0)}m`"
             :range="hs_by_time_range"
             :values="hs_by_time_inv"
+          />
+        </g>
+        <g transform="translate(-40 0)">
+          <linear-selection-y
+            :domain="hs_freq_domain"
+            :range="hs_by_time_range"
+            :range_quant_incr="2"
+            :width="40"
+            :height="100"
+            :display_fn="x => `${x.toFixed(1)}m`"
+            :quant_incr="hs_freq_quant_incr"
+            v-bind="hs_selection"
+          />
+          <linear-brush-y
+            :domain="hs_freq_domain"
+            :range="hs_by_time_range"
+            :range_quant_incr="2"
+            :width="40"
+            :height="100"
+            :quant_incr="hs_freq_quant_incr"
+            v-bind="hs_selection"
           />
         </g>
         <g v-if="time_axis_visible" transform="translate(0 105)">
@@ -384,7 +426,7 @@
         <linear-brush-x
           :domain="time_domain"
           :width="360"
-          :height="100"
+          :height="140"
           :quant_incr="time_quant_incr"
           v-bind="time_selection"
         />
@@ -402,7 +444,9 @@ import radialAxisY from './radial/axis-y'
 import radialGridX from './radial/grid-x'
 import radialGridY from './radial/grid-y'
 import linearBrushX from './linear/brush-x'
+import linearBrushY from './linear/brush-y'
 import linearSelectionX from './linear/selection-x'
+import linearSelectionY from './linear/selection-y'
 import linearHistogram from './linear/histogram'
 import linearHistogramAxisX from './linear/histogram-axis-x'
 import linearAxisX from './linear/axis-x'
@@ -430,7 +474,9 @@ export default {
     radialGridX,
     radialGridY,
     linearBrushX,
+    linearBrushY,
     linearSelectionX,
+    linearSelectionY,
     linearHistogram,
     linearHistogramAxisX,
     linearAxisX,
